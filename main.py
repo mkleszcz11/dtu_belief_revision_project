@@ -1,21 +1,66 @@
 from belief_revision_agent import BeliefRevisionAgent
 
 agent = BeliefRevisionAgent()
-agent.add_belief([1, -2])  # Adding a belief: p or not q
-agent.add_belief([-1, 3])  # Adding another belief: not p or r
 
-# Attempt to add a conflicting belief
-agent.revise_belief([-3])  # Adding a belief: not r
 
-# Check beliefs
-print("Is 'p or not q' a belief? ", agent.check_belief([1, -2]))
-print("Is 'not r' a belief? ", agent.check_belief([-3]))
 
-# Output current knowledge base
-print("Current Knowledge Base:")
-for clause in agent.knowledge_base:
-    print(clause)
-   
-print("###################")
+while True:
+    print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
+    belief = input()
+    if belief == "exit":
+        break
+    agent.add_belief(belief)
     
-print(agent.knowledge_base)
+    print("Current Belief Base:")
+    agent.belief_base.display_beliefs()
+    print("----------")
+
+
+
+
+
+
+# #add "r"
+# agent.add_belief([
+#     [("r", True)]
+#     ])
+
+# # add p or s
+# agent.add_belief([
+#     [("p", True), ("s", True)], 
+#     [("z", False), ("w", False)]
+#     ])
+
+
+# # add a and b and c
+# agent.add_belief([
+#     [("a", True), ("b", True), ("c", True)]
+#     ])
+
+# agent.add_implication("a", "b")
+
+# agent.belief_base.display_beliefs()
+
+# print("####################")
+# print(agent.belief_base.belief_sets)
+
+
+#agent.add_belief([-1, 3])  # Adding another belief: not p or r
+
+
+
+# # Attempt to add a conflicting belief
+# agent.revise_belief([-3])  # Adding a belief: not r
+
+# # Check beliefs
+# print("Is 'p or not q' a belief? ", agent.check_belief([1, -2]))
+# print("Is 'not r' a belief? ", agent.check_belief([-3]))
+
+# # Output current knowledge base
+# print("Current Knowledge Base:")
+# for clause in agent.knowledge_base:
+#     print(clause)
+   
+# print("###################")
+    
+# print(agent.knowledge_base)
