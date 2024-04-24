@@ -1,4 +1,4 @@
-from sympy import symbols, Not, Or, And, Equivalent
+from sympy import symbols, Not, Or, And, Equivalent, Implies
 from sympy.logic.boolalg import to_cnf
 
 class BeliefBase:
@@ -12,15 +12,15 @@ class BeliefBase:
         Add a belief to the belief base.
         
         clause should be in the form of a disjunction of literals (e.g. ~(A | B) | D)).
+        Implies(p & q, r")  should be: p & q >> r
+        Equivalent(a | b, c) should be: a | b = c
         '''
-        # if not isinstance(clause, Or):
-        #     raise ValueError("The belief should be a disjunction of literals")
-
-        cnf_clause = to_cnf(clause)
+        cnf_clause = to_cnf(clause, simplify=True)
         our_belief = self.from_symbols_to_list(cnf_clause)
 
         self.beliefs.append(our_belief)
-            
+
+   
     def from_symbols_to_list(self, clause):
         '''
         Converts a CNF clause to a standardized nested list format.
@@ -37,6 +37,7 @@ class BeliefBase:
         else:
             return [[self.process_literal(clause)]]  # Single literal
 
+
     def process_or_literals(self, or_clause):
         '''
         Process an 'Or' clause into a list of literals.
@@ -45,6 +46,7 @@ class BeliefBase:
             return [self.process_literal(lit) for lit in or_clause.args]
         else:
             return [self.process_literal(or_clause)]
+
 
     def process_literal(self, literal):
         '''
@@ -71,10 +73,13 @@ class BeliefBase:
 #####################################
 
 # bb = BeliefBase()
-# bb.add_belief("A")
-# bb.add_belief("A & B")
-# bb.add_belief("A | B")
-# bb.add_belief("(D | ~A) & (D | ~B)")
+# A, B, D, p, q, r, a, b, c = symbols('A B D p q r a b c')
+# bb.add_belief(A)
+# bb.add_belief(A & B)
+# bb.add_belief(A | B)
+# bb.add_belief((D | ~A) & (D | ~B))
+# bb.add_belief(p & q >> r)
+# bb.add_belief(Equivalent(a | b, c))
 
 # #print raw database
 # for idx, belief in enumerate(bb.beliefs):
