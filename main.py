@@ -2,8 +2,6 @@ from belief_revision_agent import BeliefRevisionAgent
 
 agent = BeliefRevisionAgent()
 
-
-
 while True:
     print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
     belief = input()
@@ -12,11 +10,8 @@ while True:
     agent.add_belief(belief)
     
     print("Current Belief Base:")
-    agent.belief_base.display_beliefs()
+    print(agent.belief_base.pretty_print())
     print("----------")
-
-
-
 
 
 
