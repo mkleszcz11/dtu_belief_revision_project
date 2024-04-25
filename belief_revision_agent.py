@@ -11,6 +11,10 @@ class BeliefRevisionAgent:
         self.belief_base.add_belief(clause)
 
 
+    def clear_beliefs(self):
+        self.belief_base.clear_beliefs()
+
+
     def revise_belief(self, new_clause):
         """Method for revising beliefs based on new information"""
         # Solver to check consistency with new belief

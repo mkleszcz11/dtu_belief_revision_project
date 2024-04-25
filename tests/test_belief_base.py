@@ -4,7 +4,7 @@ from belief_base import BeliefBase
 from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 
-A, B, D, p, q, r, a, b, c = symbols('A B D p q r a b c')
+A, B, D, p, q, r, s, a, b, c = symbols('A B D p q r s a b c')
 
 class TestBeliefBase(unittest.TestCase):
     def setUp(self):
@@ -69,18 +69,69 @@ class TestBeliefBase(unittest.TestCase):
 
     @unittest.mock.patch('builtins.print')
     def test_agent_check_belief(self, mock_print):
-        # Arrange
+        # Example A - Arrange
         self.agent.add_belief(p)
         self.agent.add_belief(p >> q)
-
-        # Act
+        # Example A - Act
         result_q = self.agent.check_belief(q)
         result_a = self.agent.check_belief(a)
-
-        # Assert
+        # Example A - Assert
         self.assertTrue(result_q)
         self.assertFalse(result_a)
         mock_print.assert_called_with("Belief is not entailed: [[(True, 'a')]]")
+        
+        # Clear beliefs
+        self.agent.clear_beliefs()
+        
+        # Example B - Arrange
+        self.agent.add_belief((p & q) >> s)
+        self.agent.add_belief(p)
+        self.agent.add_belief(q)
+        # Example B - Act
+        result_s = self.agent.check_belief(s)
+        result_p = self.agent.check_belief(p)
+        # Example B - Assert
+        self.assertTrue(result_s)
+        self.assertTrue(result_p)
+        
+        # Clear beliefs
+        self.agent.clear_beliefs()
+        
+        # Example C - Arrange
+        self.agent.add_belief((a | b) >> c)
+        self.agent.add_belief(b)
+        # Example C - Act
+        result_c = self.agent.check_belief(c)
+        # Example C - Assert
+        self.assertTrue(result_c)
+        
+        # Clear beliefs
+        self.agent.clear_beliefs()
+        
+        # Example D - Arrange
+        self.agent.add_belief(p >> q)
+        self.agent.add_belief(r >> s)
+        self.agent.add_belief(p >> r)
+        self.agent.add_belief(p)
+        # Example D - Act
+        result_s = self.agent.check_belief(s)
+        result_q = self.agent.check_belief(q)
+        result_r = self.agent.check_belief(r)
+        # Example D - Assert
+        self.assertTrue(result_s)
+        self.assertTrue(result_q)
+        self.assertTrue(result_r)
+        
+        # Clear beliefs
+        self.agent.clear_beliefs()
+        
+        # Example E - Arrange
+        self.agent.add_belief((~r | p | s) & (~p | r) & (~s | r) & (~r))
+        # Example E - Act
+        result_not_p = self.agent.check_belief(~p)
+        # Example E - Assert
+        self.assertTrue(result_not_p)
+
 
 if __name__ == '__main__':
     unittest.main()
