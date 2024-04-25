@@ -27,29 +27,25 @@ class Solver:
         https://www.youtube.com/watch?v=SjEQNOV5FMk&t=189s
         '''
         from itertools import combinations
-
-        # A set to keep track of all unique resolvents to avoid infinite loops.
-        unique_resolvents = set()
         
+        clauses = []
+        for clause in self.clauses:
+            for c in clause:
+                clauses.append(c)
+
+        new_clauses = []
+
         while True:
-            new = []
-            # Use combinations to ensure each pair is only considered once.
-            for clause1, clause2 in combinations(self.clauses, 2):
-                resolvent = self.resolve(clause1, clause2)
-                for clause in resolvent:
-                    # Normalize each clause by sorting (to avoid different orders creating 'new' clauses)
-                    normalized_clause = tuple(sorted(clause))
-                    if normalized_clause == tuple():
-                        return True  # Empty clause found: contradiction!
-                    if normalized_clause not in unique_resolvents:
-                        unique_resolvents.add(normalized_clause)
-                        new.append(clause)
+            for clause1, clause2 in combinations(clauses, 2):
+                resolvents = self.resolve(clause1, clause2)
+                if [] in resolvents:
+                    return True
+                new_clauses.extend(resolvents)
+        
+            if self.check_if_subset(new_clauses, clauses):
+                return False
 
-            if not new:
-                return False  # No new clauses were generated, stop the loop
-
-            # Update the knowledge base with new findings
-            self.clauses.extend(new)
+            clauses.extend(new_clauses) # TODO Optimaze to add only unique clauses
 
 
     def resolve(self, clause1, clause2):
@@ -57,22 +53,21 @@ class Solver:
         Resolve two clauses.
         '''
         resolvents = []
-
-        clause1 = clause1[0]
-        clause2 = clause2[0]
-
-        if isinstance(clause1, tuple):
-            clause1 = [clause1]
-        if isinstance(clause2, tuple):
-            clause2 = [clause2]
-
-        for literal1 in clause1:
-            for literal2 in clause2:
-                if literal1[0] != literal2[0] and literal1[1] == literal2[1]:
-                    # Create a new clause excluding the conflicting literals
-                    new_clause = [lit for lit in clause1 if lit != literal1] + [lit for lit in clause2 if lit != literal2]
-                    # Remove duplicates and ensure order to prevent reprocessing
-                    new_clause_sorted = tuple(sorted(set(new_clause), key=lambda x: (x[1], not x[0])))
-                    if new_clause_sorted not in [tuple(r) for r in resolvents]:
-                        resolvents.append(new_clause_sorted)
+        for el_1 in clause1:
+            for el_2 in clause2:
+                if el_1[1] == el_2[1] and el_1[0] != el_2[0]:
+                    resolvents.append([x for x in clause1 if x != el_1] + [x for x in clause2 if x != el_2])
         return resolvents
+        
+
+    def check_if_subset(self, list1, list2):
+        '''
+        Check if list1 is a subset of list2.
+        
+        Note: lit1 and list2 contain lists of tuples.
+        '''
+        
+        for item in list1:
+            if item not in list2:
+                return False
+        return True
