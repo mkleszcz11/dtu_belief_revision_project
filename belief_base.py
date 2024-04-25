@@ -4,7 +4,7 @@ from sympy.logic.boolalg import to_cnf
 class BeliefBase:
     def __init__(self):
         self.beliefs = []
-        self.belief_sets = []
+        #self.belief_sets = [] # probably not needed
 
 
     def add_belief(self, clause):
@@ -15,10 +15,17 @@ class BeliefBase:
         Implies(p & q, r")  should be: p & q >> r
         Equivalent(a | b, c) should be: a | b = c
         '''
+        new_belief = self.format_symopy_to_our_format(clause)
+
+        self.beliefs.append(new_belief)
+        
+    def format_symopy_to_our_format(self, clause):
+        '''
+        Convert a sympy clause to our format.
+        '''
         cnf_clause = to_cnf(clause, simplify=True)
         our_belief = self.from_symbols_to_list(cnf_clause)
-
-        self.beliefs.append(our_belief)
+        return our_belief
 
    
     def from_symbols_to_list(self, clause):
@@ -26,8 +33,8 @@ class BeliefBase:
         Converts a CNF clause to a standardized nested list format.
         Examples:
             A should be: [[(True, "A")]]
-            A & B should be: [[(True, "A"), (True, "B")]]
-            A | B should be: [[(True, "A")], [(True, "B")]]
+            A & B should be: [[(True, "A")], [(True, "B")]]
+            A | B should be: [[(True, "A"), (True, "B")]]
             (D | ~A) & (D | ~B) should be: [[(True, "D"), (False, "A")], [(True, "D"), (False, "B")]]
         '''
         if isinstance(clause, And):

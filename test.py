@@ -38,8 +38,8 @@ def test_belief_base_raw_output():
         # print(expected_output[i])
         assert agent.belief_base.beliefs[i] == expected_output[i]
     
-    print("-------------")
     print("test_belief_base_raw_output passed")
+    print("-------------")
 
 
 def test_belief_base_pretty_print():
@@ -71,8 +71,8 @@ def test_belief_base_pretty_print():
     # print(expected_output)
 
     assert agent.belief_base.pretty_print() == expected_output
-    print("-------------")
     print("test_belief_base_pretty_print passed")
+    print("-------------")
 
 
 def test_agent_check_belief():
@@ -82,14 +82,21 @@ def test_agent_check_belief():
     3. Check the non-entailed beliefs
     '''
     agent = BeliefRevisionAgent()
-    agent.add_belief("A")
-    agent.add_belief("A & B")
-    agent.add_belief("A | B")
+    agent.add_belief(p)
+    agent.add_belief(p >> q)
+    
+    assert agent.check_belief(q) == True  # q is entailed
+    assert agent.check_belief(a) == False # a is not entailed
+
+    #TODO some complex tests
+    print("test_agent_check_belief passed")
+    print("-------------")
 
 
 def main():
     test_belief_base_raw_output()
     test_belief_base_pretty_print()
+    test_agent_check_belief()
     print("All tests passed.")
 
 
