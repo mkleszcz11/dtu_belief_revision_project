@@ -19,6 +19,14 @@ class BeliefBase:
 
         self.beliefs.append(new_belief)
         
+
+    def clear_beliefs(self):
+        '''
+        Clear all beliefs from the belief base.
+        '''
+        self.beliefs = []
+
+        
     def format_symopy_to_our_format(self, clause):
         '''
         Convert a sympy clause to our format.
