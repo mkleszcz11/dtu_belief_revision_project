@@ -68,7 +68,7 @@ class TestBeliefBase(unittest.TestCase):
 
 
     @unittest.mock.patch('builtins.print')
-    def test_agent_check_belief(self, mock_print):
+    def test_agent_check_belief_A(self, mock_print):
         # Example A - Arrange
         self.agent.add_belief(p)
         self.agent.add_belief(p >> q)
@@ -79,10 +79,10 @@ class TestBeliefBase(unittest.TestCase):
         self.assertTrue(result_q)
         self.assertFalse(result_a)
         mock_print.assert_called_with("Belief is not entailed: [[(True, 'a')]]")
-        
-        # Clear beliefs
-        self.agent.clear_beliefs()
-        
+
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_check_belief_B(self, mock_print):
         # Example B - Arrange
         self.agent.add_belief((p & q) >> s)
         self.agent.add_belief(p)
@@ -93,10 +93,10 @@ class TestBeliefBase(unittest.TestCase):
         # Example B - Assert
         self.assertTrue(result_s)
         self.assertTrue(result_p)
-        
-        # Clear beliefs
-        self.agent.clear_beliefs()
-        
+
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_check_belief_C(self, mock_print):
         # Example C - Arrange
         self.agent.add_belief((a | b) >> c)
         self.agent.add_belief(b)
@@ -104,10 +104,10 @@ class TestBeliefBase(unittest.TestCase):
         result_c = self.agent.check_belief(c)
         # Example C - Assert
         self.assertTrue(result_c)
-        
-        # Clear beliefs
-        self.agent.clear_beliefs()
-        
+
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_check_belief_D(self, mock_print):
         # Example D - Arrange
         self.agent.add_belief(p >> q)
         self.agent.add_belief(r >> s)
@@ -121,10 +121,10 @@ class TestBeliefBase(unittest.TestCase):
         self.assertTrue(result_s)
         self.assertTrue(result_q)
         self.assertTrue(result_r)
-        
-        # Clear beliefs
-        self.agent.clear_beliefs()
-        
+
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_check_belief(self, mock_print):
         # Example E - Arrange
         self.agent.add_belief((~r | p | s) & (~p | r) & (~s | r) & (~r))
         # Example E - Act
