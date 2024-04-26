@@ -1,10 +1,30 @@
 from belief_revision_agent import BeliefRevisionAgent
+from sympy import symbols
 
 agent = BeliefRevisionAgent()
 
 
-# MAIN IS NOT WORKING, WRITE A NEW ONE
+w = symbols('w')
 
+agent.add_belief_with_revision(w, 0.7)
+# agent.show_beliefs()
+agent.add_belief_with_revision(~w, 0.3)
+# agent.show_beliefs()
+agent.add_belief_with_revision(~w, 0.9)
+# agent.show_beliefs()
+
+agent.show_beliefs(pretty=False)
+
+        
+# MAIN IS NOT WORKING, WRITE A NEW ONE
+# w = symbols('w')
+# print("Adding belief w with 0.7")
+# agent.add_belief_with_revision(w, 0.7)
+# print("Adding belief ~w with 0.3")
+# agent.add_belief_with_revision(~w, 0.3)
+# print("Adding belief ~w with 0.8")
+# agent.add_belief_with_revision(~w, 0.8)
+# #agent.add_belief_with_revision(~w, 0.3)
 
 # while True:
 #     print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
