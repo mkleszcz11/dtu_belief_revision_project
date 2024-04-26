@@ -1,10 +1,14 @@
+from belief_base import Belief
+
 class Solver:
     def __init__(self):
-        self.clauses = [] # clauses must be in CNF, stored as a list of lists of tuples, were each tuple is a literal (is_positive, symbol)
+        self.beliefs = [] # clauses must be in CNF, stored as a list of lists of tuples, were each tuple is a literal (is_positive, symbol)
     
-    def add_clause(self, clause):
-        self.clauses.append(clause)
-        
+
+    def add_belief(self, belief: Belief):
+        self.beliefs.append(belief)
+
+
     def check_clauses(self) -> bool:
         '''
         Method for checking if the clauses are entailed.
@@ -29,8 +33,9 @@ class Solver:
         from itertools import combinations
         
         clauses = []
-        for clause in self.clauses:
-            for c in clause:
+
+        for belief in self.beliefs:
+            for c in belief.clause:
                 clauses.append(c)
 
         new_clauses = []

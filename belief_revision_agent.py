@@ -1,4 +1,4 @@
-from belief_base import BeliefBase
+from belief_base import BeliefBase, Belief
 from solver import Solver
 
 
@@ -7,34 +7,33 @@ class BeliefRevisionAgent:
         self.belief_base = BeliefBase()
 
 
-    def add_belief(self, clause):
-        self.belief_base.add_belief(clause)
+    def add_belief(self, clause, priority=0):
+        self.belief_base.add_belief(clause, priority)
 
 
     def clear_beliefs(self):
         self.belief_base.clear_beliefs()
 
 
-    def revise_belief(self, new_clause):
+    def revise_belief(self, new_clause, priority=0):
         """Method for revising beliefs based on new information"""
         # Solver to check consistency with new belief
         solver =  Solver()
         
         # Add all beliefs to the solver
-        for clause in self.belief_base.beliefs:
-            solver.add_clause(clause)
-        solver.add_clause(new_clause)
-        
+        for belief in self.belief_base.beliefs:
+            solver.add_belief(belief)
+
+        solver.add_belief(new_clause, priority)
+ 
         # Check if the new knowledge is consistent
         if solver.check_clauses():
             # If consistent, add the new belief
-            self.knowledge_base.append(new_clause)
+            self.add_belief(new_clause, priority)
         else:
             # If not consistent, perform contraction
             print("Conflict detected. Contracting knowledge base.")
-            self.contract_knowledge(new_clause)
-        
-        solver.delete()
+            self.contract_knowledge(new_clause, priority)
 
 
     def contract_knowledge(self, conflicting_clause):
@@ -44,7 +43,7 @@ class BeliefRevisionAgent:
         pass
 
 
-    def check_belief(self, pos_clause):
+    def check_clause(self, pos_clause):
         '''
         Method for checking logical entailment (e.g., resolution-based)
         
@@ -53,15 +52,17 @@ class BeliefRevisionAgent:
                      converted to our custom CNF.
         '''
         solver = Solver()
-        for clause in self.belief_base.beliefs:
-            solver.add_clause(clause)
+        for belief in self.belief_base.beliefs:
+            solver.add_belief(belief)
         
-        pos_clause = self.belief_base.format_symopy_to_our_format(pos_clause)
+        pos_clause = self.belief_base.format_sympy_clause_to_our_format(pos_clause)
         neg_clause = []
         for literal in pos_clause:
             neg_clause.append([(not literal[0][0], literal[0][1])])
 
-        solver.add_clause(neg_clause)
+        belief_to_check = Belief()
+        belief_to_check.clause = neg_clause
+        solver.add_belief(belief_to_check)
         
         if solver.check_clauses(): # contradiction found for neg_clause, so the belief is entailed for pos_clause
             print(f"Belief is entailed: {pos_clause}")
