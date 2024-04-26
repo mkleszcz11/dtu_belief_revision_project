@@ -2,16 +2,20 @@ from belief_revision_agent import BeliefRevisionAgent
 
 agent = BeliefRevisionAgent()
 
-while True:
-    print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
-    belief = input()
-    if belief == "exit":
-        break
-    agent.add_belief(belief)
+
+# MAIN IS NOT WORKING, WRITE A NEW ONE
+
+
+# while True:
+#     print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
+#     belief = input()
+#     if belief == "exit":
+#         break
+#     agent.add_belief(belief)
     
-    print("Current Belief Base:")
-    print(agent.belief_base.pretty_print())
-    print("----------")
+#     print("Current Belief Base:")
+#     print(agent.belief_base.pretty_print())
+#     print("----------")
 
 
 
