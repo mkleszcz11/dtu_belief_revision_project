@@ -1,13 +1,19 @@
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 from sympy.logic.boolalg import to_cnf
 
+
+class Belief:
+    def __init__(self):
+        self.clause = []
+        self.priority = 0
+
+
 class BeliefBase:
     def __init__(self):
-        self.beliefs = []
-        #self.belief_sets = [] # probably not needed
+        self.beliefs = [] # List of Beliefs
 
 
-    def add_belief(self, clause):
+    def add_belief(self, clause, priority=0):
         '''
         Add a belief to the belief base.
         
@@ -15,10 +21,24 @@ class BeliefBase:
         Implies(p & q, r")  should be: p & q >> r
         Equivalent(a | b, c) should be: a | b = c
         '''
-        new_belief = self.format_symopy_to_our_format(clause)
+        new_belief = Belief()
+        new_belief.clause = self.format_sympy_clause_to_our_format(clause)
+        new_belief.priority = priority
 
         self.beliefs.append(new_belief)
+  
+
+    def remove_belief(self, clause):
+        '''
+        Remove a belief from the belief base.
+        '''
+        new_belief = self.format_sympy_clause_to_our_format(clause)
         
+        #find the belief to remove
+        for belief in self.beliefs:
+            if belief.clause == new_belief:
+                self.beliefs.remove(belief)
+
 
     def clear_beliefs(self):
         '''
@@ -27,7 +47,7 @@ class BeliefBase:
         self.beliefs = []
 
         
-    def format_symopy_to_our_format(self, clause):
+    def format_sympy_clause_to_our_format(self, clause):
         '''
         Convert a sympy clause to our format.
         '''
@@ -71,15 +91,17 @@ class BeliefBase:
             return (False, str(literal.args[0]))
         else:
             return (True, str(literal))
-        
+
 
     def pretty_print(self):
         output = []
         for idx, belief in enumerate(self.beliefs):
+            clause = belief.clause
             formatted = ' AND '.join(['(' + ' OR '.join(
                 f"{'not ' + element[1] if not element[0] else element[1]}" for element in disjunction
-            ) + ')' for disjunction in belief])
-            output.append(f"Belief {idx + 1}: {formatted}")
+            ) + ')' for disjunction in clause])
+            priority = belief.priority
+            output.append(f"Belief {idx + 1}: priority: {priority}, clause: {formatted}")
         return "\n".join(output)
         
 
