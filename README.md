@@ -11,5 +11,5 @@ pip install -r requirements.txt
 ## Run unit tests
 
 ```shell
-python -m unittest
+python -m unittest -v
 ```
