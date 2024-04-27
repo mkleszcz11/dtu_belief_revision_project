@@ -5,9 +5,8 @@ from sympy import symbols, Not, Or, And, Equivalent, Implies
 
 class AGM_Rev:
 
-    def __init__(self, agent):
-        self.belief_base = agent.belief_base.deepcopy()
-        print(f"Hello: {self.belief_base.beliefs}")
+    # def __init__(self):
+    #     self.belief_base = []
     
     def agm_success(self, belief_base, phi):
 
@@ -126,13 +125,13 @@ def main():
     belief_base_test = [1, 2, 3]
     phi_test = 4
 
-    # test = AGM_Rev()
+    test = AGM_Rev()
 
-    # print(f"succes: {test.agm_success(belief_base_test, phi_test)}")
-    # print(f"inclusion: {test.agm_inclusion(belief_base_test, phi_test)}")
-    # print(f"vacuity: {test.agm_vacuity(belief_base_test, phi_test)}")
-    # print(f"consistency: {test.agm_consistency(belief_base_test, phi_test)}")
-    # print(f"extensionality: {test.agm_extensionality(belief_base_test, phi_test)}")
+    print(f"succes: {test.agm_success(belief_base_test, phi_test)}")
+    print(f"inclusion: {test.agm_inclusion(belief_base_test, phi_test)}")
+    print(f"vacuity: {test.agm_vacuity(belief_base_test, phi_test)}")
+    print(f"consistency: {test.agm_consistency(belief_base_test, phi_test)}")
+    print(f"extensionality: {test.agm_extensionality(belief_base_test, phi_test)}")
 
 if __name__ == "__main__":
     main()
