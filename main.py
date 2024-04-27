@@ -1,7 +1,20 @@
 from belief_revision_agent import BeliefRevisionAgent
+from agms_revision import AGM_Rev
 
 agent = BeliefRevisionAgent()
 
+
+print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
+belief = input()
+agent.add_belief(belief)
+testing = AGM_Rev(agent)
+
+print("Current Belief Base:")
+print(agent.belief_base.pretty_print())
+print("----------")
+
+# print("Testing AGMs")
+# print(testing.agm_success(agent.belief_base, []))
 
 # MAIN IS NOT WORKING, WRITE A NEW ONE
 
