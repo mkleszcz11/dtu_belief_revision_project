@@ -4,16 +4,18 @@ from sympy import symbols
 agent = BeliefRevisionAgent()
 
 
-w = symbols('w')
+w, p = symbols('w p')
+agent.add_belief_with_revision(w, 0.8)
+agent.add_belief_with_revision(p, 0.6)
 
-agent.add_belief_with_revision(w, 0.7)
-# agent.show_beliefs()
-agent.add_belief_with_revision(~w, 0.3)
-# agent.show_beliefs()
-agent.add_belief_with_revision(~w, 0.9)
-# agent.show_beliefs()
+# agent.add_belief_with_revision(w, 0.7)
+# # agent.show_beliefs()
+# agent.add_belief_with_revision(~w, 0.3)
+# # agent.show_beliefs()
+# agent.add_belief_with_revision(~w, 0.9)
+# # agent.show_beliefs()
 
-agent.show_beliefs(pretty=False)
+# agent.show_beliefs(pretty=False)
 
         
 # MAIN IS NOT WORKING, WRITE A NEW ONE
