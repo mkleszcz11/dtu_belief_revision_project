@@ -3,7 +3,7 @@ from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 
 
-class AGM:
+class AGM_Rev:
 
     # def __init__(self):
     #     self.belief_base = []
@@ -125,7 +125,7 @@ def main():
     belief_base_test = [1, 2, 3]
     phi_test = 4
 
-    test = AGM()
+    test = AGM_Rev()
 
     print(f"succes: {test.agm_success(belief_base_test, phi_test)}")
     print(f"inclusion: {test.agm_inclusion(belief_base_test, phi_test)}")
