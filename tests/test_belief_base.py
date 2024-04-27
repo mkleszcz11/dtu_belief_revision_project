@@ -41,7 +41,7 @@ class TestBeliefBase(unittest.TestCase):
         stored_clauses = []
         for belief in self.agent.belief_base.beliefs:
             stored_clauses.append(belief.clause)
-        
+
         self.assertEqual(stored_clauses, expected_output)
 
 
@@ -71,7 +71,7 @@ class TestBeliefBase(unittest.TestCase):
 
         # Assert
         self.assertEqual(self.agent.belief_base.pretty_print(), expected_output)
-        
+
 
 if __name__ == '__main__':
     unittest.main()

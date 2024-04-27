@@ -82,8 +82,8 @@ class TestBeliefBase(unittest.TestCase):
         result_not_p = self.agent.check_clause_for_entilement(~p)
         # Example E - Assert
         self.assertTrue(result_not_p)
-        
-        
+
+
     @unittest.mock.patch('builtins.print')
     def test_agent_check_clause_for_entailment_F(self, mock_print):
         # Example F - Arrange
@@ -112,7 +112,7 @@ class TestBeliefBase(unittest.TestCase):
 
 
     @unittest.mock.patch('builtins.print')
-    def test_agent_check_contradiction_basic(self, mock_print):        
+    def test_agent_check_contradiction_basic(self, mock_print):
         self.agent.add_belief_with_revision(w, 0.7, verbose_print=True)
         # mock_print.assert_called_with(self.common_logs["belief_added"])
         self.agent.add_belief_with_revision(~w, 0.3, verbose_print=True)
@@ -140,7 +140,7 @@ class TestBeliefBase(unittest.TestCase):
         # Adding a belief
         self.agent.add_belief_with_revision(w, 0.5)
         mock_print.assert_called_with(self.common_logs["belief_added"])
-        
+
         # Adding a contradictory belief with the same priority
         self.agent.add_belief_with_revision(~w, 0.5)
         mock_print.assert_called_with(self.common_logs["higher_priority_contradiction"])
@@ -151,11 +151,11 @@ class TestBeliefBase(unittest.TestCase):
         # Adding a belief
         self.agent.add_belief_with_revision(w, 0.8)
         mock_print.assert_called_with(self.common_logs["belief_added"])
-        
+
         # Adding another non-contradictory belief
         self.agent.add_belief_with_revision(p, 0.6)
         mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-        
+
         # Ensure no contradiction related logs are called
         with self.assertRaises(AssertionError):
             mock_print.assert_called_with(self.common_logs["higher_priority_contradiction"])
@@ -167,11 +167,11 @@ class TestBeliefBase(unittest.TestCase):
     #     #Adding first belief
     #     self.agent.add_belief_with_revision(Equivalent(a | b, c), 0.7)
     #     mock_print.assert_called_with(self.common_logs["belief_added"])
-        
+
     #     #Adding second belief
     #     self.agent.add_belief_with_revision(q, 0.8)
     #     mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-        
+
     #     #Adding third belief
     #     self.agent.add_belief_with_revision(a | c, 0.9)
     #     mock_print.assert_called_with(self.common_logs["lower_priority_contradiction"])

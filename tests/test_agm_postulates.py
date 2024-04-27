@@ -1,12 +1,14 @@
 import unittest
 import unittest.mock
+from copy import copy
+from solver import Solver
 from belief_base import Belief
 from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 
 A, B, C, D, p, q, r, s, a, b, c = symbols('A B C D p q r s a b c')
 
-class TestBeliefBase(unittest.TestCase):
+class TestAGMPostulatesPartA(unittest.TestCase):
     def setUp(self):
         self.agent_a = BeliefRevisionAgent()
         self.agent_b = BeliefRevisionAgent()
@@ -62,8 +64,8 @@ class TestBeliefBase(unittest.TestCase):
                     match = True
             self.assertTrue(match)
 
-    # @unittest.mock.patch('builtins.print')
-    def test_agent_AGM_revision_inclusion_false(self):
+    @unittest.mock.patch('builtins.print')
+    def test_agent_AGM_revision_inclusion_false(self, mock_print):
         # check if the belief base of agent_b is not a subset of agent_a
         # Arrange
         self.agent_a.add_belief(p)
@@ -138,14 +140,14 @@ class TestBeliefBase(unittest.TestCase):
         self.assertNotEqual(agent_a_beliefs, agent_b_beliefs)
 
 
-    @unittest.mock.patch('builtins.print')
-    def test_agent_AGM_revision_consistency_true(self, mock_print):
-        #check if the belief base and phi is not contradictory then the revision of B with phi should still be consistent
-        pass
+    # @unittest.mock.patch('builtins.print')
+    # def test_agent_AGM_revision_consistency_true(self, mock_print):
+    #     #check if the belief base and phi is not contradictory then the revision of B with phi should still be consistent
+    #     pass
 
-    @unittest.mock.patch('builtins.print')
-    def test_agent_AGM_revision_consistency_false(self, mock_print):
-        pass
+    # @unittest.mock.patch('builtins.print')
+    # def test_agent_AGM_revision_consistency_false(self, mock_print):
+    #     pass
 
 
     @unittest.mock.patch('builtins.print')
@@ -183,3 +185,64 @@ class TestBeliefBase(unittest.TestCase):
         # Assert
         agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]
         self.assertNotEqual(agent_a_beliefs, agent_b_beliefs)
+
+
+class TestAGMPostulatesPartB(unittest.TestCase):
+    @unittest.mock.patch('builtins.print')
+    def setUp(self, mock_print):
+        self.agent = BeliefRevisionAgent()
+        self.agent.add_belief(s,0.2)
+        self.agent.add_belief(a,0.2)
+        self.agent.show_beliefs(pretty=False)
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_AGM_consitency(self, mock_print):
+        # Arrange
+        phi = BeliefRevisionAgent()
+        phi.add_belief(s, 0.2)
+
+        solver =  Solver()
+        solver1 = Solver()
+        # phi = BeliefRevisionAgent()
+        # Add all beliefs to the solver
+        for belief in phi.belief_base.beliefs:
+            solver.add_belief(belief)
+            print(solver.resolution())
+
+        # Act
+        #check phi is consistent or not
+        phi_consistent = solver.check_clauses()
+
+        # Assert
+        if  phi_consistent:
+            print("q")
+            return False
+
+        B1 = copy(self.agent)
+        B1.show_beliefs(pretty=False)
+        for belief in phi.belief_base.beliefs:
+            B1.revise_belief(belief)
+            B1.show_beliefs(pretty=False)
+            for belief in phi.belief_base.beliefs:
+                solver1.add_belief(belief)
+                new = solver1.resolution()
+                self.assertFalse(new)
+
+    @unittest.mock.patch('builtins.print')
+    def test_agent_AGM_extensionality(self, mock_print):
+        # Arrange
+        x = BeliefRevisionAgent()
+        y = BeliefRevisionAgent()
+        x.add_belief(s,0.2)
+        y.add_belief(s,0.2)
+        # Act
+        B2 = copy(self.agent)
+        B3 = copy(self.agent)
+        for belief in x.belief_base.beliefs:
+            B2.revise_belief(belief)
+        for belief in y.belief_base.beliefs:
+            B3.revise_belief(belief)
+        # Assert
+        beliefs_B2 = [belief.clause for belief in B2.belief_base.beliefs]
+        beliefs_B3 = [belief.clause for belief in B3.belief_base.beliefs]
+        self.assertEqual(beliefs_B2, beliefs_B3)
