@@ -1,6 +1,6 @@
 import unittest
 import unittest.mock
-from belief_base import BeliefBase
+from belief_base import Belief
 from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 
@@ -24,6 +24,7 @@ class TestBeliefBase(unittest.TestCase):
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_success_false(self, mock_print):
+        # check if the belief base is not updated with random belief
         # Arrange
         self.agent_a.add_belief(A)
         # Act
@@ -36,42 +37,72 @@ class TestBeliefBase(unittest.TestCase):
     def test_agent_AGM_revision_inclusion_true(self, mock_print):
         # check if the belief base of agent_a is a subset of agent_b
         # Arrange
-        self.agent_a.add_belief(A)
-        self.agent_a.revise_belief((A & B & C))
+        self.agent_a.add_belief(p)
+        self.agent_a.add_belief(q)
+        self.agent_a.add_belief(Implies(p, q))
 
-        self.agent_b.add_belief(A)
+        self.agent_b.add_belief(p)
+        self.agent_b.add_belief(q)
+        self.agent_b.add_belief(Implies(p, q))
+        self.agent_b.add_belief(Not(q))
+
         # Act
-        self.agent_b.add_belief((A & B & C))
+        self.agent_a.revise_belief(Not(q))
+
         # Assert
         self.assertTrue(all([belief_a in self.agent_b.belief_base.beliefs for belief_a in self.agent_a.belief_base.beliefs]))
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_inclusion_false(self, mock_print):
-        #TODO figure out better belief base comparison (one the will fail the test)
+        # check if the belief base of agent_b is not a subset of agent_a
         # Arrange
-        self.agent_a.add_belief(A)
-        self.agent_a.revise_belief((A & B & C))
+        self.agent_a.add_belief(p)
+        self.agent_a.add_belief(q)
+        self.agent_a.add_belief(Implies(p, q))
 
-        self.agent_b.add_belief(A)
+        self.agent_b.add_belief(p)
+        self.agent_b.add_belief(q)
+        self.agent_b.add_belief(Implies(p, q))
+        self.agent_b.add_belief(Not(q))
+
         # Act
-        self.agent_b.add_belief((A & B & C))
+        self.agent_a.revise_belief(Not(q))
         # Assert
-        # check if the belief base of agent_a is a subset of agent_b
-        self.assertFalse(all([x in self.agent_b.belief_base.beliefs for x in self.agent_a.belief_base.beliefs]))
+        self.assertFalse(all([belief_b in self.agent_a.belief_base.beliefs for belief_b in self.agent_b.belief_base.beliefs]))
 
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_vacuity_true(self, mock_print):
         # check if ~phi is not in the belief base then revision of B with phi is should be the same as B expanded with phi
         # Arrange
-        self.agent_a.add_belief(A)
+        self.agent_a.add_belief(p)
+        self.agent_a.add_belief(Implies(p, q))
+        self.agent_a.add_belief(q)
 
-        phi = A & B
-        pass
+        self.agent_b.add_belief(p)
+        self.agent_b.add_belief(Implies(p, q))
+
+        # Act
+        self.agent_b.revise_belief(q)
+
+        # Assert
+        self.assertEqual(self.agent_a.belief_base.beliefs, self.agent_b.belief_base.beliefs)
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_vacuity_false(self, mock_print):
-        pass
+        # Arrange
+        self.agent_a.add_belief(p)
+        self.agent_a.add_belief(Implies(p, q))
+        self.agent_a.add_belief(~q)
+
+        self.agent_b.add_belief(p)
+        self.agent_b.add_belief(Implies(p, q))
+
+        # Act
+        self.agent_b.revise_belief(~q)
+
+        # Assert
+        self.assertNotEqual(self.agent_a.belief_base.beliefs, self.agent_b.belief_base.beliefs)
 
 
     @unittest.mock.patch('builtins.print')
