@@ -8,9 +8,11 @@ agent = BeliefRevisionAgent()
 A, B, D, p, q, r, s, w, a, b, c = symbols('A B D p q r s w a b c')
 
 
-agent.add_belief_with_revision(w, 0.7, verbose_print=True)
-agent.add_belief_with_revision(~w, 0.3, verbose_print=True)
-agent.add_belief_with_revision(~w, 0.9, verbose_print=True)
+agent.add_belief_with_revision(p, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(~p, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(~w, 0.9, verbose_print=True)
+
+
 
 # agent.add_belief_with_revision(p >> r, verbose_print=True)
 # # agent.add_belief_with_revision(p >> q)

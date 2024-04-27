@@ -2,7 +2,7 @@ from belief_base import BeliefBase, Belief
 from solver import Solver
 import warnings
 import copy
-
+from agms_revision import AGM_Rev
 
 class BeliefRevisionAgent:
     def __init__(self):
@@ -15,12 +15,19 @@ class BeliefRevisionAgent:
         
         The method checks if the new belief is consistent with the current beliefs.
         If it is not, the method performs contraction.
+
         '''
         new_belief = Belief()
         new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(clause)
         new_belief.priority = priority
 
+        bb_copy = copy.deepcopy(self.belief_base)
+        belief_copy = copy.deepcopy(self.new_belief.clause)
+        beliefs_separated = [belief.clause for belief in self.belief_copy.beliefs]
+
         self.revise_belief(new_belief, verbose_print)
+
+        self.check_agms("success", beliefs_separated, new_belief.clause)
 
 
     def add_belief(self, clause, priority=0):
@@ -127,7 +134,7 @@ class BeliefRevisionAgent:
         return local_base
 
 
-    def check_clause_for_no_contradiction(self, clause, local_base=None) -> (bool, Belief):
+    def check_clause_for_no_contradiction(self, clause, local_base=None) -> tuple[bool, Belief]:
         '''
         Method for checking contradiction for the specified clause, regarding the belief base.
         
@@ -177,3 +184,10 @@ class BeliefRevisionAgent:
         else:
             print(f"Belief is not entailed: {pos_clause}")
             return False
+
+    def check_agms(self, agm, belief_base, phi):
+
+        if agm == "Success":
+            testing = AGM_Rev()
+            result = testing.agm_success(belief_base, phi)
+        print("agm succ")
