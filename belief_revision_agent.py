@@ -121,20 +121,20 @@ class BeliefRevisionAgent:
         '''
         Method for checking contradiction for the specified clause, regarding the belief base.
         
-        return: True if the clause is consistent, False otherwise (contradiction found)
+        return: True if there is no contradiction, false otherwise
         '''
         solver = Solver()
         for belief in self.belief_base.beliefs:
             solver.add_belief(belief)
             
         new_belief = Belief()
-
+        new_belief.clause = clause
         solver.add_belief(new_belief)
         
         if solver.resolution():
-            return True
-        else:
             return False
+        else:
+            return True
 
 
     def check_clause_for_entilement(self, pos_clause) -> bool:
