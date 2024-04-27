@@ -57,7 +57,10 @@ class Solver:
             if self.check_if_subset(new_clauses, clauses):
                 return False
 
-            clauses.extend(new_clauses) # TODO Optimaze to add only unique clauses
+            # For every new clause that is not in the list of clauses, add it to this list
+            for cl in new_clauses:
+                if cl not in clauses:
+                    clauses.append(cl)
 
 
     def resolve_clauses(self, clause1, clause2):
