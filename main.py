@@ -9,19 +9,25 @@ agent = BeliefRevisionAgent()
 A, B, D, p, q, r, s, w, a, b, c = symbols('A B D p q r s w a b c')
 
 
-agent.add_belief_with_revision(p, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(p, 0.7, verbose_print=True)
 # agent.add_belief_with_revision(~p, 0.7, verbose_print=True)
 # agent.add_belief_with_revision(~w, 0.9, verbose_print=True)
 
+agent.add_belief_with_revision(p, 0.90, verbose_print=True)
+agent.add_belief_with_revision(p >> r, 0.6, verbose_print=True)
+# agent.add_belief_with_revision((r & a & b), 0.7, verbose_print=True)
+# agent.add_belief_with_revision((~r), 0.4, verbose_print=True)
+# agent.add_belief_with_revision((~r), 0.7, verbose_print=True)
+# agent.add_belief_with_revision((~r), 0.99, verbose_print=True)
 
+# agent.add_belief_with_revision(p >> r, 0.9, verbose_print=True)
+# agent.add_belief_with_revision(p >> q, 0.8)
+# agent.add_belief_with_revision(p, 0.9, verbose_print=True)
+# agent.add_belief_with_revision((~r | s ), 0.7, verbose_print=True)
 
-# agent.add_belief_with_revision(p >> r, verbose_print=True)
-# # agent.add_belief_with_revision(p >> q)
-# agent.add_belief_with_revision(p, verbose_print=True)
-# agent.add_belief_with_revision(~r, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(((p | q) >> r), 0.5)
 
-print("Current Belief Base:")
-agent.show_beliefs()
+# agent.show_beliefs()
 
 
 # #Adding first belief
@@ -44,14 +50,13 @@ agent.show_beliefs()
 # agent.show_beliefs(pretty=False)
 
 
-print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
-belief = input()
-agent.add_belief(belief)
-testing = AGM_Rev(agent)
+# print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
+# belief = input()
+# agent.add_belief(belief)
 
-print("Current Belief Base:")
-print(agent.belief_base.pretty_print())
-print("----------")
+# print("Current Belief Base:")
+# print(agent.belief_base.pretty_print())
+# print("----------")
 
 # print("Testing AGMs")
 # print(testing.agm_success(agent.belief_base, []))

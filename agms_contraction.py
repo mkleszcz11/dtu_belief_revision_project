@@ -1,5 +1,4 @@
 from belief_base import BeliefBase
-from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
 
 

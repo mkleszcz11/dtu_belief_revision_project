@@ -19,15 +19,35 @@ class BeliefRevisionAgent:
         '''
         new_belief = Belief()
         new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(clause)
-        new_belief.priority = priority
+        new_belief.priority = priority                                      # New belief added to queue
 
-        bb_copy = copy.deepcopy(self.belief_base)
-        belief_copy = copy.deepcopy(self.new_belief.clause)
-        beliefs_separated = [belief.clause for belief in self.belief_copy.beliefs]
+        bb_copy: BeliefBase = copy.deepcopy(self.belief_base)
+        phi_copy: Belief = copy.deepcopy(new_belief)
+        beliefs_separated = [belief.clause for belief in bb_copy.beliefs]
+        phi_separated = phi_copy.clause
 
-        self.revise_belief(new_belief, verbose_print)
+        # print("phi: ", phi_copy)
+        # print("phi sep: ", phi_separated)
+        # print(f"before: {beliefs_separated}")
 
-        self.check_agms("success", beliefs_separated, new_belief.clause)
+        result = self.revise_belief(new_belief, verbose_print)                       # Belief revised with the queue
+
+        bb_after_exp: BeliefBase = copy.deepcopy(bb_copy)
+        bb_after_exp.add_belief(new_belief.clause, new_belief.priority)
+        bb_exp_sep = [belief.clause for belief in bb_after_exp.beliefs]
+
+        bb_after_rev: BeliefBase = copy.deepcopy(self.belief_base)
+        bb_rev_sep = [belief.clause for belief in bb_after_rev.beliefs]
+
+        # print(f"after: {bb_separated}")
+
+        if result:
+            print(self.check_agms("Success", belief_rev=bb_rev_sep, phi=phi_copy))
+            # print(self.check_agms("Inclusion", belief_rev=bb_rev_sep, belief_exp=bb_exp_sep))
+            # print(self.check_agms("Vacuity", belief_rev=bb_rev_sep, phi=phi_copy))
+            # print(self.check_agms("Consistency", belief_rev=bb_rev_sep, phi=phi_copy))
+        else:
+            print("AGMs not needed")
 
 
     def add_belief(self, clause, priority=0):
@@ -80,16 +100,19 @@ class BeliefRevisionAgent:
         if self.belief_base.beliefs == []:
             self.add_belief(new_belief.clause, new_belief.priority)
             print("Belief added to the database.")
+            return True
         else:
             if self.check_clause_for_no_contradiction(new_belief.clause):
-                # Contradiction found for negated clause
+                # Contradiction not found for negated clause
                 self.add_belief(new_belief.clause, new_belief.priority)
                 print("No contradiction found. Belief added to the database.")
+                return True
             else:
                 #print("Contradiction found. Performing contraction.")
                 # If contradiction found, perform contraction
                 # print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
-                self.contract_knowledge(new_belief, verbose_print)
+                res = self.contract_knowledge(new_belief, verbose_print)
+                return res
 
 
     def contract_knowledge(self, conflicting_belief: Belief, verbose_print=False) -> BeliefBase:
@@ -117,7 +140,8 @@ class BeliefRevisionAgent:
             if not self.check_clause_for_no_contradiction(conflicting_belief.clause, local_base):
                 if new_global_belief.priority >= conflicting_belief.priority:
                     print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
-                    return self.belief_base
+                    # return self.belief_base    # Marcel change
+                    return False
                 else:
                     local_base.remove_belief(new_global_belief.clause)
                     beliefs_to_remove.append(new_global_belief)
@@ -131,7 +155,8 @@ class BeliefRevisionAgent:
             for belief in beliefs_to_remove:
                 print(f"Priority: {belief.priority}, Belief: {belief.clause}")
 
-        return local_base
+        # return local_base  # Marcel change
+        return True
 
 
     def check_clause_for_no_contradiction(self, clause, local_base=None) -> tuple[bool, Belief]:
@@ -185,9 +210,21 @@ class BeliefRevisionAgent:
             print(f"Belief is not entailed: {pos_clause}")
             return False
 
-    def check_agms(self, agm, belief_base, phi):
+    def check_agms(self, choice, belief_rev, belief_exp=[], phi=[]):
 
-        if agm == "Success":
-            testing = AGM_Rev()
-            result = testing.agm_success(belief_base, phi)
-        print("agm succ")
+        # print(f"bb {belief_base}")
+        # print(f"phi: {phi}")
+
+        testing = AGM_Rev()
+
+        if choice == "Success":
+            result = testing.agm_success(belief_rev, phi.clause)
+        elif choice == "Inclusion":
+            result = testing.agm_inclusion(belief_rev, belief_exp)
+        elif choice == "Vacuity":
+            print(f"phi: {phi}")
+            result = True
+        elif choice == "Consistency":
+            result = testing.agm_consistency(belief_rev, phi)
+
+        return result

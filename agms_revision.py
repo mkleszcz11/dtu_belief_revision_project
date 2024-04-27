@@ -1,7 +1,6 @@
 from belief_base import BeliefBase
-from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
-
+from solver import Solver
 
 class AGM_Rev:
 
@@ -11,19 +10,11 @@ class AGM_Rev:
     
     def agm_success(self, belief_base, phi):
 
-        belief_base_copy = belief_base.copy()
-        belief_base_copy.append(phi)
-        result = self.find_phi_in_base(belief_base_copy, phi)
+        result = self.find_phi_in_base(belief_base, phi)
+
         return result
 
-    def agm_inclusion(self, belief_base, phi):
-
-        base_expanded = belief_base.copy()
-        base_revised = belief_base.copy()
-
-        base_revised.remove(2)
-        base_revised.append(phi)
-        base_expanded.append(phi)
+    def agm_inclusion(self, base_revised, base_expanded):
 
         result = self.compare_bases(base_revised, base_expanded)
 
@@ -31,11 +22,7 @@ class AGM_Rev:
 
     def agm_vacuity(self, belief_base, phi):
 
-        belief_base_copy = belief_base.copy()
-        phi_copy = phi
-        not_phi = 6
-
-        phi_found = self.find_phi_in_base(belief_base_copy, not_phi)
+        phi_found = self.find_phi_in_base(belief_base, not_phi)
 
         if phi_found:
             
@@ -70,6 +57,34 @@ class AGM_Rev:
 
         return result_consist
     
+    def check_consistent(belief_rev,phi):
+        solver =  Solver()
+        solver1 = Solver()
+        # phi = BeliefRevisionAgent()
+        # Add all beliefs to the solver
+        for belief in phi.belief_base.beliefs:
+            solver.add_belief(belief)
+            print(solver.resolution())
+            
+        #check phi is consistent or not    
+        phi_consistent = solver.check_clauses()  
+        # print(phi_consistent)    
+        
+        if  phi_consistent:
+            # print("q")
+            return False
+        
+        # B1 = agent.copy()
+        # B1.show_beliefs(pretty=False)
+        for belief in phi.belief_base.beliefs:
+            # B1.revise_belief(belief)
+            B1.show_beliefs(pretty=False)
+            for belief in phi.belief_base.beliefs:
+                solver1.add_belief(belief)
+                new = solver1.resolution()
+                if not new :
+                    return True
+    
     def agm_extensionality(self, belief_base, phi):
 
         phi_copy = phi
@@ -94,8 +109,7 @@ class AGM_Rev:
         # base 1 = revised base
         # base 2 = expanded base
 
-        base1_copy = base1.copy()
-        base2_copy = base2.copy()
+        
 
         state = False
 
@@ -112,8 +126,13 @@ class AGM_Rev:
     
     def find_phi_in_base(self, belief_base, phi):
 
+        print(f"bb1: {belief_base}")
+        print(f"phi: {phi}")
+
         for belief in belief_base:
             if belief == phi:
+                print("compared1: ", belief)
+                print("compared2: ", phi)
                 return True
         else:
             return False
