@@ -1,12 +1,35 @@
 from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols
 
+from sympy import symbols, Not, Or, And, Equivalent, Implies
+
 agent = BeliefRevisionAgent()
 
+A, B, D, p, q, r, s, w, a, b, c = symbols('A B D p q r s w a b c')
 
-w, p = symbols('w p')
-agent.add_belief_with_revision(w, 0.8)
-agent.add_belief_with_revision(p, 0.6)
+
+agent.add_belief_with_revision(w, 0.7, verbose_print=True)
+agent.add_belief_with_revision(~w, 0.3, verbose_print=True)
+agent.add_belief_with_revision(~w, 0.9, verbose_print=True)
+
+# agent.add_belief_with_revision(p >> r, verbose_print=True)
+# # agent.add_belief_with_revision(p >> q)
+# agent.add_belief_with_revision(p, verbose_print=True)
+# agent.add_belief_with_revision(~r, 0.7, verbose_print=True)
+
+print("Current Belief Base:")
+agent.show_beliefs()
+
+
+# #Adding first belief
+# agent.add_belief_with_revision(Equivalent(a | b, c), 0.7)
+
+# #Adding second belief
+# agent.add_belief_with_revision(q, 0.8)
+
+# #Adding third belief
+# agent.add_belief_with_revision(a | c, 0.9)
+
 
 # agent.add_belief_with_revision(w, 0.7)
 # # agent.show_beliefs()
