@@ -3,9 +3,9 @@ from sympy.logic.boolalg import to_cnf
 
 
 class Belief:
-    def __init__(self):
-        self.clause = []
-        self.priority = 0
+    def __init__(self, clause=[], priority=0):
+        self.clause = clause
+        self.priority = priority
 
 
 class BeliefBase:
