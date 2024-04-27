@@ -17,10 +17,11 @@ class TestBeliefBase(unittest.TestCase):
         # check if the belief base is updated with the new belief
         # Arrange
         self.agent_a.add_belief(A)
+        expected_clause = [[(True, 'A')], [(True, 'B')], [(True, 'C')]]
         # Act
-        self.agent_a.revise_belief((A & B & C))
+        self.agent_a.add_belief_with_revision((A & B & C))
         # Assert
-        self.assertTrue(any([A & B & C in belief for belief in self.agent_a.belief_base.beliefs]))
+        self.assertTrue(any([expected_clause == belief.clause for belief in self.agent_a.belief_base.beliefs]))
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_success_false(self, mock_print):
@@ -28,9 +29,9 @@ class TestBeliefBase(unittest.TestCase):
         # Arrange
         self.agent_a.add_belief(A)
         # Act
-        self.agent_a.revise_belief(B)
+        self.agent_a.add_belief_with_revision(B)
         # Assert
-        self.assertNotEqual(self.agent.belief_base.beliefs, [[A], [C]])
+        self.assertNotEqual(self.agent_a.belief_base.beliefs, [[A], [C]])
 
 
     @unittest.mock.patch('builtins.print')
@@ -41,34 +42,60 @@ class TestBeliefBase(unittest.TestCase):
         self.agent_a.add_belief(q)
         self.agent_a.add_belief(Implies(p, q))
 
-        self.agent_b.add_belief(p)
-        self.agent_b.add_belief(q)
-        self.agent_b.add_belief(Implies(p, q))
-        self.agent_b.add_belief(Not(q))
+        agent_b_beliefs = [
+            [[(True, 'p')]],
+            [[(True, 'q')]],
+            [[(True, 'q'), (False, 'p')]],
+            [[(False, 'q')]]
+            ]
 
         # Act
-        self.agent_a.revise_belief(Not(q))
+        self.agent_a.add_belief_with_revision(Not(q))
 
         # Assert
-        self.assertTrue(all([belief_a in self.agent_b.belief_base.beliefs for belief_a in self.agent_a.belief_base.beliefs]))
 
-    @unittest.mock.patch('builtins.print')
-    def test_agent_AGM_revision_inclusion_false(self, mock_print):
+        # All beliefs in agent_a should be in agent_b
+        for belief_a in self.agent_a.belief_base.beliefs:
+            match = False
+            for belief_b in agent_b_beliefs:
+                if belief_a.clause == belief_b:
+                    match = True
+            self.assertTrue(match)
+
+    # @unittest.mock.patch('builtins.print')
+    def test_agent_AGM_revision_inclusion_false(self):
         # check if the belief base of agent_b is not a subset of agent_a
         # Arrange
         self.agent_a.add_belief(p)
         self.agent_a.add_belief(q)
         self.agent_a.add_belief(Implies(p, q))
 
-        self.agent_b.add_belief(p)
-        self.agent_b.add_belief(q)
-        self.agent_b.add_belief(Implies(p, q))
-        self.agent_b.add_belief(Not(q))
+        agent_b_beliefs = [
+            [[(True, 'p')]],
+            [[(True, 'q')]],
+            [[(True, 'q'), (False, 'p')]],
+            [[(False, 'q')]]
+            ]
 
         # Act
-        self.agent_a.revise_belief(Not(q))
+        self.agent_a.add_belief_with_revision(Not(q))
+
         # Assert
-        self.assertFalse(all([belief_b in self.agent_a.belief_base.beliefs for belief_b in self.agent_b.belief_base.beliefs]))
+        # at least one belief in agent_b should not be in agent_a
+        matches = []
+        for belief_b in agent_b_beliefs:
+            match = False
+            for belief_a in self.agent_a.belief_base.beliefs:
+                if belief_a.clause == belief_b:
+                    print(belief_a.clause)
+                    match = True
+            matches.append(match)
+
+        # passes if there is at least one true in the matches list
+        self.assertTrue(any(matches))
+        # passes if there is at least one false in the matches list
+        self.assertFalse(all(matches))
+
 
 
     @unittest.mock.patch('builtins.print')
@@ -77,32 +104,38 @@ class TestBeliefBase(unittest.TestCase):
         # Arrange
         self.agent_a.add_belief(p)
         self.agent_a.add_belief(Implies(p, q))
-        self.agent_a.add_belief(q)
 
-        self.agent_b.add_belief(p)
-        self.agent_b.add_belief(Implies(p, q))
+        agent_b_beliefs = [
+            [[(True, 'p')]],
+            [[(True, 'q'), (False, 'p')]],
+            [[(True, 'q')]]
+            ]
 
         # Act
-        self.agent_b.revise_belief(q)
+        self.agent_a.add_belief_with_revision(q)
 
         # Assert
-        self.assertEqual(self.agent_a.belief_base.beliefs, self.agent_b.belief_base.beliefs)
+        agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]
+        self.assertEqual(agent_a_beliefs, agent_b_beliefs)
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_vacuity_false(self, mock_print):
         # Arrange
         self.agent_a.add_belief(p)
         self.agent_a.add_belief(Implies(p, q))
-        self.agent_a.add_belief(~q)
 
-        self.agent_b.add_belief(p)
-        self.agent_b.add_belief(Implies(p, q))
+        agent_b_beliefs = [
+            [[(True, 'p')]],
+            [[(True, 'q'), (False, 'p')]],
+            [[(False, 'q')]]
+            ]
 
         # Act
-        self.agent_b.revise_belief(~q)
+        self.agent_a.add_belief_with_revision(~q)
 
         # Assert
-        self.assertNotEqual(self.agent_a.belief_base.beliefs, self.agent_b.belief_base.beliefs)
+        agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]
+        self.assertNotEqual(agent_a_beliefs, agent_b_beliefs)
 
 
     @unittest.mock.patch('builtins.print')
@@ -118,8 +151,35 @@ class TestBeliefBase(unittest.TestCase):
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_extensionality_true(self, mock_print):
         # check if revision with [p] and [p || p] gives the same belief base
-        pass
+        # Arrange
+        self.agent_a.add_belief(q)
+
+        agent_b_beliefs = [
+            [[(True, 'q')]],
+            [[(True, 'p')]]
+        ]
+
+        # Act
+        self.agent_a.add_belief_with_revision(Or(p, p))
+
+        # Assert
+        agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]
+        self.assertEqual(agent_a_beliefs, agent_b_beliefs)
+
 
     @unittest.mock.patch('builtins.print')
     def test_agent_AGM_revision_extensionality_false(self, mock_print):
-        pass
+        # Arrange
+        self.agent_a.add_belief(q)
+
+        agent_b_beliefs = [
+            [[(True, 'q')]],
+            [[(True, 'p')], [(True, 'p')]]
+        ]
+
+        # Act
+        self.agent_a.add_belief_with_revision(Or(p, p))
+
+        # Assert
+        agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]
+        self.assertNotEqual(agent_a_beliefs, agent_b_beliefs)
