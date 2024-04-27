@@ -55,7 +55,19 @@ class AGM:
             return result
         
     def agm_consistency(self, belief_base, phi):
-        return 
+
+        belief_base_copy = belief_base.copy()
+
+        phi_consist = self.check_consistency(phi)
+        
+        belief_base_copy.remove(2)
+        belief_base_copy.append(phi)
+
+        bb_consist = self.check_consistency(belief_base_copy)
+
+        result_consist = phi_consist & bb_consist
+
+        return result_consist
     
     def agm_extensionality(self, belief_base, phi):
 
@@ -75,29 +87,6 @@ class AGM:
 
         return result
 
-        
-    '''''
-
-    pseudo code for the rest
-
-  
-
-    def agm_consistency(self, belief_base, phi):
-        
-        phi_cons = check_consistency(phi)
-        belief_base_cons = check_consistency(revision(belief_base, phi))
-
-        if phi_cons == success && belief_base_cons == success: success else: failure
-
-    def agm_extensionality(self, belief_base, phi):
-        
-        check_phi = [phi | phi]
-        belief_base_new1 = revision(belief_base, phi)
-        belief_base_new2 = revision(belief_base, check_phi)
-
-        if belief_base_new1 == belief_base_new2: success else: failure
-
-    '''
 
     def compare_bases(self, base1, base2):
 
@@ -107,20 +96,18 @@ class AGM:
         base1_copy = base1.copy()
         base2_copy = base2.copy()
 
-        state = "failure"
+        state = False
 
         for belief1 in base1:
             for belief2 in base2:
                 if belief1 == belief2:
-                    state = "success"
+                    state = True
                     break
             else:
-                state = "failure"
+                state = False
                 break
-        if state == "success":
-            return True
-        else:
-            return False
+
+        return state
     
     def find_phi_in_base(self, belief_base, phi):
 
@@ -129,6 +116,9 @@ class AGM:
                 return True
         else:
             return False
+        
+    def check_consistency(self, belief_base):
+        return True
 
 
 def main():
@@ -140,17 +130,8 @@ def main():
     print(f"succes: {test.agm_success(belief_base_test, phi_test)}")
     print(f"inclusion: {test.agm_inclusion(belief_base_test, phi_test)}")
     print(f"vacuity: {test.agm_vacuity(belief_base_test, phi_test)}")
+    print(f"consistency: {test.agm_consistency(belief_base_test, phi_test)}")
     print(f"extensionality: {test.agm_extensionality(belief_base_test, phi_test)}")
-
-    # print(test.find_phi_in_base(belief_base_test, phi_test))
-    # test.agm_vacuity(belief_base_test, phi_test)
-    # print(test.agm_vacuity(belief_base_test, phi_test)) 
-
-    # belief_base_test_exp = belief_base_test.copy()
-    # belief_base_test_exp.append(phi_test)
-
-    # assert test.compare_bases(belief_base_test, belief_base_test_exp) == True
-
 
 if __name__ == "__main__":
     main()
