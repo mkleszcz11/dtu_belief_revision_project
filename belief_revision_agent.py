@@ -7,6 +7,7 @@ from agms_revision import AGM_Rev
 class BeliefRevisionAgent:
     def __init__(self):
         self.belief_base = BeliefBase()
+        self.flag = True
 
 
     def add_belief_with_revision(self, clause, priority=0, verbose_print=False):
@@ -21,60 +22,22 @@ class BeliefRevisionAgent:
         new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(clause)
         new_belief.priority = priority                                      # New belief added to queue
 
+        belief_copy = copy.deepcopy(new_belief)
         clause_copy = copy.deepcopy(clause)
-        # print(clause_copy)
-
-        clause_test_vac = f"~{clause_copy}"
-        # print(clause_test_vac)
-
-        new_belief_test_vac = Belief()
-        new_belief_test_vac.clause = self.belief_base.format_sympy_clause_to_our_format(clause_test_vac)
-        new_belief_test_vac.priority = priority     
-
-        # print(new_belief_test_vac.clause)
-
-        clause_test_ext = f"{clause_copy} | {clause_copy}"
-        # print(clause_test)
-
-        
-
-        new_belief_test = Belief()
-        new_belief_test.clause = self.belief_base.format_sympy_clause_to_our_format(clause_test_ext)
-        new_belief_test.priority = priority     
-
-        # print(f"comparison: {new_belief.clause} and {new_belief_test.clause}")
-
+        priority_copy = copy.deepcopy(priority)   
         bb_copy: BeliefBase = copy.deepcopy(self.belief_base)
-        phi_copy: Belief = copy.deepcopy(new_belief)
-        beliefs_separated = [belief.clause for belief in bb_copy.beliefs]
-        phi_separated = phi_copy.clause
 
-        # print("phi: ", phi_copy)
-        # print("phi sep: ", phi_separated)
-        # print(f"before: {beliefs_separated}")
+        self.flag = True  
 
-        result = self.revise_belief(new_belief, verbose_print)                       # Belief revised with the queue
-
-        bb_after_exp: BeliefBase = copy.deepcopy(bb_copy)
-        bb_after_exp.add_belief(new_belief.clause, new_belief.priority)
-        bb_exp_sep = [belief.clause for belief in bb_after_exp.beliefs]
+        self.revise_belief(new_belief, verbose_print)                       # Belief revised with the queue
 
         bb_after_rev: BeliefBase = copy.deepcopy(self.belief_base)
-        bb_rev_sep = [belief.clause for belief in bb_after_rev.beliefs]
 
-        # print(f"after: {bb_separated}")
-        
-        print("resu: ", self.check_agms("Vacuity", belief_orig=beliefs_separated, belief_rev=bb_rev_sep, belief_exp=bb_exp_sep, phi=new_belief_test_vac))
-
-        # if result:
-        #     print(self.check_agms("Success", belief_rev=bb_rev_sep, phi=phi_copy))
-        #     # print(self.check_agms("Inclusion", belief_rev=bb_rev_sep, belief_exp=bb_exp_sep))
-        #     # print(self.check_agms("Vacuity", belief_rev=bb_rev_sep, phi=phi_copy))
-        #     # print(self.check_agms("Consistency", belief_rev=bb_rev_sep, phi=phi_copy))
-        #       print("resu: ", self.check_agms("Consistency", belief_rev=bb_after_rev, phi=phi_copy))
-              # print("resu: ", self.check_agms("Extensionality", belief_rev=bb_copy, belief_exp=bb_exp_sep, phi=new_belief_test))
-        # else:
-        #     print("AGMs not needed")
+        if self.flag == True:
+            result_agms = self.check_agms(belief_orig=bb_copy, belief_rev=bb_after_rev, phi=belief_copy, clause = clause_copy, priority=priority_copy)
+            if not result_agms == True: print("AGMS VIOLATED")    
+        # # else:
+        #     print("AGMS not needed")
 
 
     def add_belief(self, clause, priority=0):
@@ -115,7 +78,7 @@ class BeliefRevisionAgent:
                 print(f"{belief.clause} / Priority: {belief.priority}")
 
 
-    def revise_belief(self, new_belief: Belief, verbose_print=False):
+    def revise_belief(self, new_belief: Belief, verbose_print=False, print_option=True):
         '''
         Method for revising beliefs based on new information.
         
@@ -123,16 +86,18 @@ class BeliefRevisionAgent:
         If it is, the method adds the new belief to the belief base.
         If it is not, the method performs contraction.
         '''
+
+        # if print_option: print("option")
         #new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(new_belief.clause)
         if self.belief_base.beliefs == []:
             self.add_belief(new_belief.clause, new_belief.priority)
-            print("Belief added to the database.")
+            if print_option: print("Belief added to the database.")
             return True
         else:
             if self.check_clause_for_no_contradiction(new_belief.clause):
                 # Contradiction not found for negated clause
                 self.add_belief(new_belief.clause, new_belief.priority)
-                print("No contradiction found. Belief added to the database.")
+                if print_option: print("No contradiction found. Belief added to the database.")
                 return True
             else:
                 #print("Contradiction found. Performing contraction.")
@@ -167,8 +132,9 @@ class BeliefRevisionAgent:
             if not self.check_clause_for_no_contradiction(conflicting_belief.clause, local_base):
                 if new_global_belief.priority >= conflicting_belief.priority:
                     print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
-                    # return self.belief_base    # Marcel change
-                    return False
+                    self.flag = False                # Marcel change
+                    return self.belief_base    
+                
                 else:
                     local_base.remove_belief(new_global_belief.clause)
                     beliefs_to_remove.append(new_global_belief)
@@ -182,8 +148,8 @@ class BeliefRevisionAgent:
             for belief in beliefs_to_remove:
                 print(f"Priority: {belief.priority}, Belief: {belief.clause}")
 
-        # return local_base  # Marcel change
-        return True
+        
+        return local_base  
 
 
     def check_clause_for_no_contradiction(self, clause, local_base=None) -> tuple[bool, Belief]:
@@ -237,52 +203,48 @@ class BeliefRevisionAgent:
             print(f"Belief is not entailed: {pos_clause}")
             return False
 
-    def check_agms(self, choice, belief_orig, belief_rev, belief_exp=[], phi=[]):
-
-        # print(f"bb {belief_base}")
-        # print(f"phi: {phi}")
+    def check_agms(self, belief_orig=[], belief_rev=[], phi=[], clause=[], priority=[]):
 
         testing = AGM_Rev()
-        
+        phi_test = BeliefRevisionAgent()
+        bb_test = BeliefRevisionAgent()
+        bb_test.belief_base = copy.deepcopy(belief_rev)
+        bb_test2 = BeliefRevisionAgent()
+        bb_test2.belief_base = copy.deepcopy(belief_rev)
+        clause_copy1 = copy.deepcopy(clause)
+        priority_copy1 = copy.deepcopy(priority)
+        clause_copy2 = copy.deepcopy(clause)
+        priority_copy2 = copy.deepcopy(priority)
 
-        if choice == "Success":
-            result = testing.agm_success(belief_rev, phi.clause)
-        elif choice == "Inclusion":
-            result = testing.agm_inclusion(belief_rev, belief_exp)
-        elif choice == "Vacuity":
+        clause_neg = f"~{clause_copy1}"
+        belief_neg = Belief()
+        belief_neg.clause = self.belief_base.format_sympy_clause_to_our_format(clause_neg)
+        belief_neg.priority = priority_copy1 
 
-            result = testing.agm_vacuity(belief_orig, belief_rev, belief_exp, phi)
+        clause_ext = f"{clause_copy2} | {clause_copy2}"
+        belief_ext = Belief()
+        belief_ext.clause = self.belief_base.format_sympy_clause_to_our_format(clause_ext)
+        belief_ext.priority = priority_copy2
+        bb_test2.revise_belief(belief_ext, print_option=False)
+        bb2_sep = [belief.clause for belief in bb_test2.belief_base.beliefs] 
 
-            if result == "Not applicable":
-                print(result)
-                result = True
-        
-        elif choice == "Consistency":
-            # print(phi.clause)
-            phi_test = BeliefRevisionAgent()
-            bb_test = BeliefRevisionAgent()
+        bb_orig_sep = [belief.clause for belief in belief_orig.beliefs]
 
-            bb_test.belief_base = belief_rev
+        bb_after_exp: BeliefBase = copy.deepcopy(belief_orig)
+        bb_after_exp.add_belief(phi.clause, phi.priority)
+        bb_exp_sep = [belief.clause for belief in bb_after_exp.beliefs]
 
-            result = testing.agm_consistency(bb_test, phi_test, phi.clause)
-         
-            phi_test.clear_beliefs
-        elif choice == "Extensionality":
+        bb_rev_sep = [belief.clause for belief in belief_rev.beliefs]
 
-            print(phi.clause)
-            # phi.clause = [phi.clause, phi.clause]
+        success = testing.agm_success(bb_rev_sep, phi.clause)
+        inclusion = testing.agm_inclusion(bb_rev_sep, bb_exp_sep)
+        vacuity = testing.agm_vacuity(bb_orig_sep, bb_rev_sep, bb_exp_sep, belief_neg)
+        if vacuity == "Not applicable": vacuity = True
+        consistency = testing.agm_consistency(bb_test, phi_test, phi.clause)  
+        extensionality = testing.agm_extensionality(bb2_sep, bb_rev_sep)
 
-            bb_test = BeliefRevisionAgent()
+        # print(f"AGM: {success}, {inclusion}, {vacuity}, {consistency}, {extensionality}")
 
-            bb_test.belief_base = belief_rev  # copy of bb before revision
-            bb_test.revise_belief(phi)
-            bb_sep = [belief.clause for belief in bb_test.belief_base.beliefs]  
-
-            bb_rev = belief_exp  #actually revised by main
-
-            print(f"test: {bb_sep}, rev: {bb_rev}")
-
-            result = testing.agm_extensionality(bb_sep, bb_rev)
-
+        result = bool(success & inclusion & vacuity & consistency & extensionality)
             
         return result

@@ -3,10 +3,6 @@ from sympy import symbols, Not, Or, And, Equivalent, Implies
 from solver import Solver
 
 class AGM_Rev:
-
-    # def __init__(self, agent):
-    #     self.belief_base = agent.belief_base.deepcopy()
-    #     print(f"Hello: {self.belief_base.beliefs}")
     
     def agm_success(self, belief_base, phi):
 
@@ -22,60 +18,28 @@ class AGM_Rev:
 
     def agm_vacuity(self, belief_orig, belief_rev, belief_exp, phi):
 
-        print("Hel", phi.clause)    
         phi_found = self.find_phi_in_base(belief_orig, phi.clause)
 
         if not phi_found:
             result = self.compare_bases(belief_rev, belief_exp)
-            print("oo")
         else:
             result = "Not applicable"      # AGM not applicable
-            print("ll")
-        
-        print("lo")
         return result
         
     def agm_consistency(self, bb_agent, phi_agent, clause) -> bool:
 
         result_phi = phi_agent.check_clause_for_no_contradiction(clause)
         result_bb = bb_agent.check_clause_for_no_contradiction([])
+
+        result = bool(result_bb*result_phi)
        
-        return result_bb*result_phi
-    
-    # def check_consistent(belief_rev,phi):
-    #     solver =  Solver()
-    #     solver1 = Solver()
-    #     # phi = BeliefRevisionAgent()
-    #     # Add all beliefs to the solver
-    #     for belief in phi.belief_base.beliefs:
-    #         solver.add_belief(belief)
-    #         print(solver.resolution())
-            
-    #     #check phi is consistent or not    
-    #     phi_consistent = solver.check_clauses()  
-    #     # print(phi_consistent)    
-        
-    #     if  phi_consistent:
-    #         # print("q")
-    #         return False
-        
-    #     # B1 = agent.copy()
-    #     # B1.show_beliefs(pretty=False)
-    #     for belief in phi.belief_rev.beliefs:
-    #         # B1.revise_belief(belief)
-    #         B1.show_beliefs(pretty=False)
-    #         for belief in phi.belief_base.beliefs:
-    #             solver1.add_belief(belief)
-    #             new = solver1.resolution()
-    #             if not new :
-    #                 return True
+        return result
     
     def agm_extensionality(self, bb1, bb2):
 
         result = self.compare_bases(bb1, bb2)
 
         return result
-
 
     def compare_bases(self, base1, base2):
 
@@ -94,33 +58,11 @@ class AGM_Rev:
     
     def find_phi_in_base(self, belief_base, phi):
 
-        print(f"bb1: {belief_base}")
-        print(f"phi: {phi}")
-
         for belief in belief_base:
-            print("compared1: ", belief)
-            print("compared2: ", phi)
             if belief == phi:
-                
                 return True
         else:
             return False
         
     def check_consistency(self, belief_base):
         return True
-
-
-def main():
-    belief_base_test = [1, 2, 3]
-    phi_test = 4
-
-    # test = AGM_Rev()
-
-    # print(f"succes: {test.agm_success(belief_base_test, phi_test)}")
-    # print(f"inclusion: {test.agm_inclusion(belief_base_test, phi_test)}")
-    # print(f"vacuity: {test.agm_vacuity(belief_base_test, phi_test)}")
-    # print(f"consistency: {test.agm_consistency(belief_base_test, phi_test)}")
-    # print(f"extensionality: {test.agm_extensionality(belief_base_test, phi_test)}")
-
-if __name__ == "__main__":
-    main()
