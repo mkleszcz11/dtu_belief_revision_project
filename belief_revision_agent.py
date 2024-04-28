@@ -21,6 +21,29 @@ class BeliefRevisionAgent:
         new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(clause)
         new_belief.priority = priority                                      # New belief added to queue
 
+        clause_copy = copy.deepcopy(clause)
+        # print(clause_copy)
+
+        clause_test_vac = f"~{clause_copy}"
+        # print(clause_test_vac)
+
+        new_belief_test_vac = Belief()
+        new_belief_test_vac.clause = self.belief_base.format_sympy_clause_to_our_format(clause_test_vac)
+        new_belief_test_vac.priority = priority     
+
+        # print(new_belief_test_vac.clause)
+
+        clause_test_ext = f"{clause_copy} | {clause_copy}"
+        # print(clause_test)
+
+        
+
+        new_belief_test = Belief()
+        new_belief_test.clause = self.belief_base.format_sympy_clause_to_our_format(clause_test_ext)
+        new_belief_test.priority = priority     
+
+        # print(f"comparison: {new_belief.clause} and {new_belief_test.clause}")
+
         bb_copy: BeliefBase = copy.deepcopy(self.belief_base)
         phi_copy: Belief = copy.deepcopy(new_belief)
         beliefs_separated = [belief.clause for belief in bb_copy.beliefs]
@@ -41,7 +64,7 @@ class BeliefRevisionAgent:
 
         # print(f"after: {bb_separated}")
         
-        print("resu: ", self.check_agms("Extensionality", belief_rev=bb_copy, belief_exp=bb_exp_sep, phi=phi_copy))
+        print("resu: ", self.check_agms("Vacuity", belief_orig=beliefs_separated, belief_rev=bb_rev_sep, belief_exp=bb_exp_sep, phi=new_belief_test_vac))
 
         # if result:
         #     print(self.check_agms("Success", belief_rev=bb_rev_sep, phi=phi_copy))
@@ -49,6 +72,7 @@ class BeliefRevisionAgent:
         #     # print(self.check_agms("Vacuity", belief_rev=bb_rev_sep, phi=phi_copy))
         #     # print(self.check_agms("Consistency", belief_rev=bb_rev_sep, phi=phi_copy))
         #       print("resu: ", self.check_agms("Consistency", belief_rev=bb_after_rev, phi=phi_copy))
+              # print("resu: ", self.check_agms("Extensionality", belief_rev=bb_copy, belief_exp=bb_exp_sep, phi=new_belief_test))
         # else:
         #     print("AGMs not needed")
 
@@ -213,7 +237,7 @@ class BeliefRevisionAgent:
             print(f"Belief is not entailed: {pos_clause}")
             return False
 
-    def check_agms(self, choice, belief_rev, belief_exp=[], phi=[]):
+    def check_agms(self, choice, belief_orig, belief_rev, belief_exp=[], phi=[]):
 
         # print(f"bb {belief_base}")
         # print(f"phi: {phi}")
@@ -226,8 +250,13 @@ class BeliefRevisionAgent:
         elif choice == "Inclusion":
             result = testing.agm_inclusion(belief_rev, belief_exp)
         elif choice == "Vacuity":
-            print(f"phi: {phi}")
-            result = True
+
+            result = testing.agm_vacuity(belief_orig, belief_rev, belief_exp, phi)
+
+            if result == "Not applicable":
+                print(result)
+                result = True
+        
         elif choice == "Consistency":
             # print(phi.clause)
             phi_test = BeliefRevisionAgent()
@@ -239,18 +268,21 @@ class BeliefRevisionAgent:
          
             phi_test.clear_beliefs
         elif choice == "Extensionality":
+
+            print(phi.clause)
+            # phi.clause = [phi.clause, phi.clause]
+
             bb_test = BeliefRevisionAgent()
 
-            bb_test.belief_base = belief_rev
+            bb_test.belief_base = belief_rev  # copy of bb before revision
             bb_test.revise_belief(phi)
-            bb_sep = [belief.clause for belief in bb_test.belief_base.beliefs]
+            bb_sep = [belief.clause for belief in bb_test.belief_base.beliefs]  
 
-            bb_rev = belief_exp
+            bb_rev = belief_exp  #actually revised by main
 
             print(f"test: {bb_sep}, rev: {bb_rev}")
 
             result = testing.agm_extensionality(bb_sep, bb_rev)
 
-
-
+            
         return result

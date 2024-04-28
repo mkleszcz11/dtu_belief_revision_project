@@ -20,27 +20,20 @@ class AGM_Rev:
 
         return result
 
-    # def agm_vacuity(self, belief_base, phi):
+    def agm_vacuity(self, belief_orig, belief_rev, belief_exp, phi):
 
-    #     phi_found = self.find_phi_in_base(belief_base, not_phi)
+        print("Hel", phi.clause)    
+        phi_found = self.find_phi_in_base(belief_orig, phi.clause)
 
-    #     if phi_found:
-            
-    #         # print("Vacuity not applicable")
-    #         return None
+        if not phi_found:
+            result = self.compare_bases(belief_rev, belief_exp)
+            print("oo")
+        else:
+            result = "Not applicable"      # AGM not applicable
+            print("ll")
         
-    #     else:
-    #         base_expanded = belief_base_copy.copy()
-    #         base_revised = belief_base_copy.copy()
-
-    #         base_revised.remove(2)
-    #         base_revised.append(phi_copy)
-
-    #         base_expanded.append(phi_copy)
-
-    #         result = self.compare_bases(base_revised, base_expanded)
-
-    #         return result
+        print("lo")
+        return result
         
     def agm_consistency(self, bb_agent, phi_agent, clause) -> bool:
 
@@ -105,9 +98,10 @@ class AGM_Rev:
         print(f"phi: {phi}")
 
         for belief in belief_base:
+            print("compared1: ", belief)
+            print("compared2: ", phi)
             if belief == phi:
-                print("compared1: ", belief)
-                print("compared2: ", phi)
+                
                 return True
         else:
             return False
