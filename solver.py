@@ -6,12 +6,19 @@ class Solver:
     
 
     def add_belief(self, belief: Belief):
+        '''
+        Add belief (our format) to the solver database.
+        '''
         self.beliefs.append(belief)
+
+
+    def remove_belief(self, belief: Belief):
+        self.beliefs.remove(belief)
 
 
     def check_clauses(self) -> bool:
         '''
-        Method for checking if the clauses are entailed.
+        Method for checking if the clauses stored in solver beliefs database are entailed.
         
         Implemented methods:
         - Resolution
@@ -40,20 +47,26 @@ class Solver:
 
         new_clauses = []
 
+        
+
         while True:
             for clause1, clause2 in combinations(clauses, 2):
-                resolvents = self.resolve(clause1, clause2)
+                # print(f"clause1: {clause1}, clause2: {clause2}")
+                resolvents = self.resolve_clauses(clause1, clause2)
                 if [] in resolvents:
-                    return True
+                    return True # Contradiction found
                 new_clauses.extend(resolvents)
         
             if self.check_if_subset(new_clauses, clauses):
                 return False
 
-            clauses.extend(new_clauses) # TODO Optimaze to add only unique clauses
+            # For every new clause that is not in the list of clauses, add it to this list
+            for cl in new_clauses:
+                if cl not in clauses:
+                    clauses.append(cl)
 
 
-    def resolve(self, clause1, clause2):
+    def resolve_clauses(self, clause1, clause2):
         '''
         Resolve two clauses.
         '''

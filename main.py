@@ -1,10 +1,81 @@
 from belief_revision_agent import BeliefRevisionAgent
+from sympy import symbols
+
+from sympy import symbols, Not, Or, And, Equivalent, Implies
+from agms_revision import AGM_Rev
 
 agent = BeliefRevisionAgent()
 
+A, B, D, p, q, r, s, w, a, b, c = symbols('A B D p q r s w a b c')
+
+
+# agent.add_belief_with_revision(p, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(~p, 0.7, verbose_print=True)
+# agent.add_belief_with_revision(~w, 0.9, verbose_print=True)
+
+agent.add_belief_with_revision(p, 0.90, verbose_print=True)
+agent.add_belief_with_revision(p >> r, 0.6, verbose_print=True)
+agent.add_belief_with_revision(p, 0.90, verbose_print=True)
+# agent.add_belief_with_revision((r & a & b), 0.7, verbose_print=True)
+# agent.add_belief_with_revision((~r), 0.4, verbose_print=True)
+# agent.add_belief_with_revision((r), 0.7, verbose_print=True)
+# agent.add_belief_with_revision((~r), 0.99, verbose_print=True)
+
+# print(1)
+# agent.add_belief_with_revision(p >> r, 0.0, verbose_print=True)
+# print(2)
+# agent.add_belief_with_revision(p >> q, 0.0)
+# print(3)
+# agent.add_belief_with_revision(p, 0.0, verbose_print=True)
+# print(4)
+# agent.add_belief_with_revision((~r), 0.0, verbose_print=True)
+# print(5)
+
+# agent.add_belief_with_revision(((p | q) >> r), 0.5)
+
+# agent.show_beliefs()
+
+
+# #Adding first belief
+# agent.add_belief_with_revision(Equivalent(a | b, c), 0.7)
+
+# #Adding second belief
+# agent.add_belief_with_revision(q, 0.8)
+
+# #Adding third belief
+# agent.add_belief_with_revision(a | c, 0.9)
+
+
+# agent.add_belief_with_revision(w, 0.7)
+# # agent.show_beliefs()
+# agent.add_belief_with_revision(~w, 0.3)
+# # agent.show_beliefs()
+# agent.add_belief_with_revision(~w, 0.9)
+# # agent.show_beliefs()
+
+# agent.show_beliefs(pretty=False)
+
+
+# print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
+# belief = input()
+# agent.add_belief(belief)
+
+# print("Current Belief Base:")
+# print(agent.belief_base.pretty_print())
+# print("----------")
+
+# print("Testing AGMs")
+# print(testing.agm_success(agent.belief_base, []))
 
 # MAIN IS NOT WORKING, WRITE A NEW ONE
-
+# w = symbols('w')
+# print("Adding belief w with 0.7")
+# agent.add_belief_with_revision(w, 0.7)
+# print("Adding belief ~w with 0.3")
+# agent.add_belief_with_revision(~w, 0.3)
+# print("Adding belief ~w with 0.8")
+# agent.add_belief_with_revision(~w, 0.8)
+# #agent.add_belief_with_revision(~w, 0.3)
 
 # while True:
 #     print("Enter a belief to add to the agent's belief base (e.g., ~(A | B) | D):")
