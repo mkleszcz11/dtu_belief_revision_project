@@ -3,9 +3,9 @@ from sympy.logic.boolalg import to_cnf
 
 
 class Belief:
-    def __init__(self):
-        self.clause = []
-        self.priority = 0
+    def __init__(self, clause=[], priority=0):
+        self.clause = clause
+        self.priority = priority
 
 
 class BeliefBase:
@@ -28,9 +28,11 @@ class BeliefBase:
         self.beliefs.append(new_belief)
   
 
-    def remove_belief(self, clause):
+    def remove_belief(self, clause) -> bool:
         '''
         Remove a belief from the belief base.
+        
+        Returns True if the remove operation was succesful, False otherwise.
         '''
         new_belief = self.format_sympy_clause_to_our_format(clause)
         
@@ -38,6 +40,8 @@ class BeliefBase:
         for belief in self.beliefs:
             if belief.clause == new_belief:
                 self.beliefs.remove(belief)
+                return True
+        return False
 
 
     def clear_beliefs(self):
@@ -51,9 +55,13 @@ class BeliefBase:
         '''
         Convert a sympy clause to our format.
         '''
+        # Check if clause is already in our format
+        if isinstance(clause, list):
+            return clause
+
         cnf_clause = to_cnf(clause, simplify=True)
-        our_belief = self.from_symbols_to_list(cnf_clause)
-        return our_belief
+        our_clause = self.from_symbols_to_list(cnf_clause)
+        return our_clause
 
    
     def from_symbols_to_list(self, clause):
@@ -101,7 +109,7 @@ class BeliefBase:
                 f"{'not ' + element[1] if not element[0] else element[1]}" for element in disjunction
             ) + ')' for disjunction in clause])
             priority = belief.priority
-            output.append(f"Belief {idx + 1}: priority: {priority}, clause: {formatted}")
+            output.append(f"Belief {idx + 1} -> priority: {priority}, clause: {formatted}")
         return "\n".join(output)
         
 
