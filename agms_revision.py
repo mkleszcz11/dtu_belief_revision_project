@@ -20,96 +20,71 @@ class AGM_Rev:
 
         return result
 
-    def agm_vacuity(self, belief_base, phi):
+    # def agm_vacuity(self, belief_base, phi):
 
-        phi_found = self.find_phi_in_base(belief_base, not_phi)
+    #     phi_found = self.find_phi_in_base(belief_base, not_phi)
 
-        if phi_found:
+    #     if phi_found:
             
-            # print("Vacuity not applicable")
-            return None
+    #         # print("Vacuity not applicable")
+    #         return None
         
-        else:
-            base_expanded = belief_base_copy.copy()
-            base_revised = belief_base_copy.copy()
+    #     else:
+    #         base_expanded = belief_base_copy.copy()
+    #         base_revised = belief_base_copy.copy()
 
-            base_revised.remove(2)
-            base_revised.append(phi_copy)
+    #         base_revised.remove(2)
+    #         base_revised.append(phi_copy)
 
-            base_expanded.append(phi_copy)
+    #         base_expanded.append(phi_copy)
 
-            result = self.compare_bases(base_revised, base_expanded)
+    #         result = self.compare_bases(base_revised, base_expanded)
 
-            return result
+    #         return result
         
-    def agm_consistency(self, belief_base, phi):
+    def agm_consistency(self, bb_agent, phi_agent, clause) -> bool:
 
-        belief_base_copy = belief_base.copy()
-
-        phi_consist = self.check_consistency(phi)
-        
-        belief_base_copy.remove(2)
-        belief_base_copy.append(phi)
-
-        bb_consist = self.check_consistency(belief_base_copy)
-
-        result_consist = phi_consist & bb_consist
-
-        return result_consist
+        result_phi = phi_agent.check_clause_for_no_contradiction(clause)
+        result_bb = bb_agent.check_clause_for_no_contradiction([])
+       
+        return result_bb*result_phi
     
-    def check_consistent(belief_rev,phi):
-        solver =  Solver()
-        solver1 = Solver()
-        # phi = BeliefRevisionAgent()
-        # Add all beliefs to the solver
-        for belief in phi.belief_base.beliefs:
-            solver.add_belief(belief)
-            print(solver.resolution())
+    # def check_consistent(belief_rev,phi):
+    #     solver =  Solver()
+    #     solver1 = Solver()
+    #     # phi = BeliefRevisionAgent()
+    #     # Add all beliefs to the solver
+    #     for belief in phi.belief_base.beliefs:
+    #         solver.add_belief(belief)
+    #         print(solver.resolution())
             
-        #check phi is consistent or not    
-        phi_consistent = solver.check_clauses()  
-        # print(phi_consistent)    
+    #     #check phi is consistent or not    
+    #     phi_consistent = solver.check_clauses()  
+    #     # print(phi_consistent)    
         
-        if  phi_consistent:
-            # print("q")
-            return False
+    #     if  phi_consistent:
+    #         # print("q")
+    #         return False
         
-        # B1 = agent.copy()
-        # B1.show_beliefs(pretty=False)
-        for belief in phi.belief_base.beliefs:
-            # B1.revise_belief(belief)
-            B1.show_beliefs(pretty=False)
-            for belief in phi.belief_base.beliefs:
-                solver1.add_belief(belief)
-                new = solver1.resolution()
-                if not new :
-                    return True
+    #     # B1 = agent.copy()
+    #     # B1.show_beliefs(pretty=False)
+    #     for belief in phi.belief_rev.beliefs:
+    #         # B1.revise_belief(belief)
+    #         B1.show_beliefs(pretty=False)
+    #         for belief in phi.belief_base.beliefs:
+    #             solver1.add_belief(belief)
+    #             new = solver1.resolution()
+    #             if not new :
+    #                 return True
     
-    def agm_extensionality(self, belief_base, phi):
+    def agm_extensionality(self, bb1, bb2):
 
-        phi_copy = phi
-        phi_check = phi
-
-        base1_revised = belief_base.copy()
-        base2_revised = belief_base.copy()
-
-        base1_revised.remove(2)
-        base1_revised.append(phi_copy)
-
-        base2_revised.remove(2)
-        base2_revised.append(phi_check)
-
-        result = self.compare_bases(base1_revised, base2_revised)
+        result = self.compare_bases(bb1, bb2)
 
         return result
 
 
     def compare_bases(self, base1, base2):
-
-        # base 1 = revised base
-        # base 2 = expanded base
-
-        
 
         state = False
 

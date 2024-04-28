@@ -40,14 +40,17 @@ class BeliefRevisionAgent:
         bb_rev_sep = [belief.clause for belief in bb_after_rev.beliefs]
 
         # print(f"after: {bb_separated}")
+        
+        print("resu: ", self.check_agms("Extensionality", belief_rev=bb_copy, belief_exp=bb_exp_sep, phi=phi_copy))
 
-        if result:
-            print(self.check_agms("Success", belief_rev=bb_rev_sep, phi=phi_copy))
-            # print(self.check_agms("Inclusion", belief_rev=bb_rev_sep, belief_exp=bb_exp_sep))
-            # print(self.check_agms("Vacuity", belief_rev=bb_rev_sep, phi=phi_copy))
-            # print(self.check_agms("Consistency", belief_rev=bb_rev_sep, phi=phi_copy))
-        else:
-            print("AGMs not needed")
+        # if result:
+        #     print(self.check_agms("Success", belief_rev=bb_rev_sep, phi=phi_copy))
+        #     # print(self.check_agms("Inclusion", belief_rev=bb_rev_sep, belief_exp=bb_exp_sep))
+        #     # print(self.check_agms("Vacuity", belief_rev=bb_rev_sep, phi=phi_copy))
+        #     # print(self.check_agms("Consistency", belief_rev=bb_rev_sep, phi=phi_copy))
+        #       print("resu: ", self.check_agms("Consistency", belief_rev=bb_after_rev, phi=phi_copy))
+        # else:
+        #     print("AGMs not needed")
 
 
     def add_belief(self, clause, priority=0):
@@ -216,6 +219,7 @@ class BeliefRevisionAgent:
         # print(f"phi: {phi}")
 
         testing = AGM_Rev()
+        
 
         if choice == "Success":
             result = testing.agm_success(belief_rev, phi.clause)
@@ -225,6 +229,28 @@ class BeliefRevisionAgent:
             print(f"phi: {phi}")
             result = True
         elif choice == "Consistency":
-            result = testing.agm_consistency(belief_rev, phi)
+            # print(phi.clause)
+            phi_test = BeliefRevisionAgent()
+            bb_test = BeliefRevisionAgent()
+
+            bb_test.belief_base = belief_rev
+
+            result = testing.agm_consistency(bb_test, phi_test, phi.clause)
+         
+            phi_test.clear_beliefs
+        elif choice == "Extensionality":
+            bb_test = BeliefRevisionAgent()
+
+            bb_test.belief_base = belief_rev
+            bb_test.revise_belief(phi)
+            bb_sep = [belief.clause for belief in bb_test.belief_base.beliefs]
+
+            bb_rev = belief_exp
+
+            print(f"test: {bb_sep}, rev: {bb_rev}")
+
+            result = testing.agm_extensionality(bb_sep, bb_rev)
+
+
 
         return result

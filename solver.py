@@ -47,8 +47,11 @@ class Solver:
 
         new_clauses = []
 
+        
+
         while True:
             for clause1, clause2 in combinations(clauses, 2):
+                # print(f"clause1: {clause1}, clause2: {clause2}")
                 resolvents = self.resolve_clauses(clause1, clause2)
                 if [] in resolvents:
                     return True # Contradiction found
