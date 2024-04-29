@@ -157,12 +157,11 @@ class TestAGMPostulatesPartA(unittest.TestCase):
         self.agent_a.add_belief(q)
 
         agent_b_beliefs = [
-            [[(True, 'q')]],
             [[(True, 'p')]]
         ]
 
         # Act
-        self.agent_a.add_belief_with_revision(Or(p, p))
+        self.agent_a.add_belief_with_revision(Or(p, p), 0.8)
 
         # Assert
         agent_a_beliefs = [belief.clause for belief in self.agent_a.belief_base.beliefs]

@@ -1,5 +1,7 @@
 # belief revision project
 
+Project tested on Python 3.12 / 3.10
+
 ## Environment setup
 
 ```shell
@@ -12,4 +14,10 @@ pip install -r requirements.txt
 
 ```shell
 python -m unittest -v
+```
+
+## Run example cases
+
+```shell
+python main.py
 ```
