@@ -1,5 +1,6 @@
 import unittest
 import unittest.mock
+from unittest.mock import call
 from belief_base import BeliefBase, Belief
 from belief_revision_agent import BeliefRevisionAgent
 from sympy import symbols, Not, Or, And, Equivalent, Implies
@@ -98,19 +99,6 @@ class TestBeliefBase(unittest.TestCase):
         self.assertFalse(result_a)
 
 
-    # @unittest.mock.patch('builtins.print')
-    # def test_agent_check_clause_for_entailment_G(self, mock_print):
-    #     # Example F - Arrange
-    #     self.agent.add_belief(Equivalent(a | b, c))
-    #     self.agent.add_belief(q)
-    #     # Example F - Act
-    #     result_q = self.agent.check_clause_for_entilement(q)
-    #     result_a = self.agent.check_clause_for_entilement(a)
-    #     # Example F - Assert
-    #     self.assertFalse(result_q)
-    #     self.assertFalse(result_a)
-
-
     @unittest.mock.patch('builtins.print')
     def test_agent_check_contradiction_basic(self, mock_print):
         self.agent.add_belief_with_revision(w, 0.7, verbose_print=True)
@@ -124,15 +112,14 @@ class TestBeliefBase(unittest.TestCase):
         #     unittest.mock.call("Priority: 0.7, Belief: [[(True, 'w')]]")
         # ])
         self.agent.show_beliefs()
-        mock_print.assert_has_calls([
-            unittest.mock.call(self.common_logs["belief_added"]),
-            unittest.mock.call(self.common_logs["higher_priority_contradiction"]),
-            unittest.mock.call(self.common_logs["lower_priority_contradiction"]),
-            unittest.mock.call(self.common_logs["beliefs_removed"]),
-            unittest.mock.call("Priority: 0.7, Belief: [[(True, 'w')]]"),
-            unittest.mock.call("Current Belief Base:"),
-            unittest.mock.call("Belief 1 -> priority: 0.9, clause: (not w)")
-        ])
+        mock_print.assert_has_calls([call('Belief added to the database.'),
+            call('Contradicting clause of higher or equal priority found. The belief was not added to the database.'),
+            call('AGMS not needed'),
+            call('Contradicting clause(s) of lower priority found. The belief was added to the database.'),
+            call('Following beliefs were removed:'),
+            call("Priority: 0.7, Belief: [[(True, 'w')]]"),
+            call('Current Belief Base:'),
+            call('Belief 1 -> priority: 0.9, clause: (not w)')])
 
 
     @unittest.mock.patch('builtins.print')
@@ -143,7 +130,10 @@ class TestBeliefBase(unittest.TestCase):
 
         # Adding a contradictory belief with the same priority
         self.agent.add_belief_with_revision(~w, 0.5)
-        mock_print.assert_called_with(self.common_logs["higher_priority_contradiction"])
+        mock_print.assert_has_calls([
+            call('Belief added to the database.'),
+            call('Contradicting clause of higher or equal priority found. The belief was not added to the database.'),
+            call('AGMS not needed')])
 
 
     @unittest.mock.patch('builtins.print')
@@ -160,21 +150,6 @@ class TestBeliefBase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             mock_print.assert_called_with(self.common_logs["higher_priority_contradiction"])
             mock_print.assert_called_with(self.common_logs["lower_priority_contradiction"])
-
-
-    # @unittest.mock.patch('builtins.print')
-    # def test_agent_contradiction_a_bit_more_complex(self, mock_print):
-    #     #Adding first belief
-    #     self.agent.add_belief_with_revision(Equivalent(a | b, c), 0.7)
-    #     mock_print.assert_called_with(self.common_logs["belief_added"])
-
-    #     #Adding second belief
-    #     self.agent.add_belief_with_revision(q, 0.8)
-    #     mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-
-    #     #Adding third belief
-    #     self.agent.add_belief_with_revision(a | c, 0.9)
-    #     mock_print.assert_called_with(self.common_logs["lower_priority_contradiction"])
 
 
     @unittest.mock.patch('builtins.print')

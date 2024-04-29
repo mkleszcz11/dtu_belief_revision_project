@@ -16,7 +16,7 @@ class BeliefBase:
     def add_belief(self, clause, priority=0):
         '''
         Add a belief to the belief base.
-        
+
         clause should be in the form of a disjunction of literals (e.g. ~(A | B) | D)).
         Implies(p & q, r")  should be: p & q >> r
         Equivalent(a | b, c) should be: a | b = c
@@ -26,16 +26,16 @@ class BeliefBase:
         new_belief.priority = priority
 
         self.beliefs.append(new_belief)
-  
+
 
     def remove_belief(self, clause) -> bool:
         '''
         Remove a belief from the belief base.
-        
+
         Returns True if the remove operation was succesful, False otherwise.
         '''
         new_belief = self.format_sympy_clause_to_our_format(clause)
-        
+
         #find the belief to remove
         for belief in self.beliefs:
             if belief.clause == new_belief:
@@ -50,7 +50,7 @@ class BeliefBase:
         '''
         self.beliefs = []
 
-        
+
     def format_sympy_clause_to_our_format(self, clause):
         '''
         Convert a sympy clause to our format.
@@ -63,7 +63,7 @@ class BeliefBase:
         our_clause = self.from_symbols_to_list(cnf_clause)
         return our_clause
 
-   
+
     def from_symbols_to_list(self, clause):
         '''
         Converts a CNF clause to a standardized nested list format.
@@ -111,7 +111,7 @@ class BeliefBase:
             priority = belief.priority
             output.append(f"Belief {idx + 1} -> priority: {priority}, clause: {formatted}")
         return "\n".join(output)
-        
+
 
 #####################################
 ########### USAGE EXAMPLE ###########
@@ -129,7 +129,7 @@ class BeliefBase:
 # #print raw database
 # for idx, belief in enumerate(bb.beliefs):
 #     print(f"Belief {idx + 1}: {belief}")
-    
+
 # # Display beliefs in a more readable format
 # pretty_db = bb.pretty_print()
 # print(pretty_db)
