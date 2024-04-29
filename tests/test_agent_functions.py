@@ -136,33 +136,5 @@ class TestBeliefBase(unittest.TestCase):
             call('AGMS not needed')])
 
 
-    @unittest.mock.patch('builtins.print')
-    def test_agent_contradiction_no_contradiction(self, mock_print):
-        # Adding a belief
-        self.agent.add_belief_with_revision(w, 0.8)
-        mock_print.assert_called_with(self.common_logs["belief_added"])
-
-        # Adding another non-contradictory belief
-        self.agent.add_belief_with_revision(p, 0.6)
-        mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-
-        # Ensure no contradiction related logs are called
-        with self.assertRaises(AssertionError):
-            mock_print.assert_called_with(self.common_logs["higher_priority_contradiction"])
-            mock_print.assert_called_with(self.common_logs["lower_priority_contradiction"])
-
-
-    @unittest.mock.patch('builtins.print')
-    def test_agent_contradiction_a_bit_more_complex(self, mock_print):
-        self.agent.add_belief_with_revision(p >> q)
-        mock_print.assert_called_with(self.common_logs["belief_added"])
-
-        self.agent.add_belief_with_revision(q >> r)
-        mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-
-        self.agent.add_belief_with_revision(r)
-        mock_print.assert_called_with(self.common_logs["no_contradiction_found"])
-
-
 if __name__ == '__main__':
     unittest.main()

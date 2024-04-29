@@ -31,9 +31,9 @@ class AGM_Rev:
         result_phi = phi_agent.check_clause_for_no_contradiction(clause)
         result_bb = bb_agent.check_clause_for_no_contradiction([])
 
-        result = bool(result_bb*result_phi)
+        result = bool(result_bb & result_phi)
 
-        return result
+        return not result
 
     def agm_extensionality(self, bb1, bb2):
 

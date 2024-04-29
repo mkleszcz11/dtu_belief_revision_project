@@ -8,6 +8,7 @@ class BeliefRevisionAgent:
     def __init__(self):
         self.belief_base = BeliefBase()
         self.flag = True
+        self.new_clause_sympy_format = None
 
 
     def add_belief_with_revision(self, clause, priority=0, verbose_print=False):
@@ -18,6 +19,8 @@ class BeliefRevisionAgent:
         If it is not, the method performs contraction.
 
         '''
+        self.new_clause_sympy_format = clause
+
         new_belief = Belief()
         new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(clause)
         new_belief.priority = priority                                      # New belief added to queue
@@ -87,6 +90,9 @@ class BeliefRevisionAgent:
         If it is not, the method performs contraction.
         '''
 
+        if not print_option:
+            self.new_clause_sympy_format = None
+
         # if print_option: print("option")
         #new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(new_belief.clause)
         if self.belief_base.beliefs == []:
@@ -103,11 +109,11 @@ class BeliefRevisionAgent:
                 #print("Contradiction found. Performing contraction.")
                 # If contradiction found, perform contraction
                 # print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
-                res = self.contract_knowledge(new_belief, verbose_print)
+                res = self.contract_knowledge(new_belief, verbose_print, print_option)
                 return res
 
 
-    def contract_knowledge(self, conflicting_belief: Belief, verbose_print=False) -> BeliefBase:
+    def contract_knowledge(self, conflicting_belief: Belief, verbose_print=False, print_option=True) -> BeliefBase:
         '''
         Method for contracting knowledge base.
 
@@ -122,17 +128,19 @@ class BeliefRevisionAgent:
 
         conflicting_belief.clause = self.belief_base.format_sympy_clause_to_our_format(conflicting_belief.clause)
 
+        self.belief_base.beliefs.sort(key=lambda x: x.priority, reverse=True)
+
         for new_global_belief in self.belief_base.beliefs:
             # 1. Add new_global_belief to the local_base
             # 2. Check for contradiction of the conflicting_belief with the local_base
             # 3. If there is a contradiction, check the priority of the new_global_belief
             # 3.1. If the priority of the new_global_belief is higher or equal, return the original belief_base
             # 3.2. If the priority of the new_global_belief is lower, remove the newly added belief from the local_base and add it to the list of removed beliefs
-            local_base.add_belief(new_global_belief.clause)
+            local_base.add_belief(new_global_belief.clause, new_global_belief.priority)
             if not self.check_clause_for_no_contradiction(conflicting_belief.clause, local_base):
                 if new_global_belief.priority >= conflicting_belief.priority:
-                    print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
-                    self.flag = False                # Marcel change
+                    if print_option: print("Contradicting clause of higher or equal priority found. The belief was not added to the database.")
+                    self.flag = False
                     return self.belief_base
 
                 else:
@@ -159,17 +167,25 @@ class BeliefRevisionAgent:
                 Tuple (False, conflicting_belief) if contradiction is found
         '''
         solver = Solver()
-        for belief in self.belief_base.beliefs:
-            solver.add_belief(belief)
+        if local_base:
+            for belief in local_base.beliefs:
+                solver.add_belief(belief)
+        else:
+            for belief in self.belief_base.beliefs:
+                solver.add_belief(belief)
 
         new_belief = Belief()
-        new_belief.clause = clause
+        if self.new_clause_sympy_format:
+            new_belief.clause = self.belief_base.format_sympy_clause_to_our_format(f"~{self.new_clause_sympy_format}")
+        else:
+            new_belief.clause = clause
         solver.add_belief(new_belief)
 
-        if solver.resolution():
-            return False
-        else:
-            return True
+        # if solver.resolution():
+        #     return False
+        # else:
+        #     return True
+        return solver.resolution()
 
 
     def check_clause_for_entilement(self, pos_clause) -> bool:
